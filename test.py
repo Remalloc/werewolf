@@ -53,9 +53,11 @@ class TestModel(unittest.TestCase):
         self.assertTupleEqual(self.wolf.add_relation(self.god, 5), (0, 2, 5))
         self.assertListEqual(self.wolf.get_relation(2), [(0, 2, 5)])
 
+
     def test_modify_relation(self):
         self.assertEqual(self.god.modify_relation(self.wolf,5),0)
         self.assertEqual(self.human.modify_relation(self.human,6),None)
+
 
     def test_get_act_record(self):
         self.assertListEqual(self.human.get_act_record(), [('support', 0)])
