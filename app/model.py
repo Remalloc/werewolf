@@ -3,10 +3,10 @@
 
 class Users:
     def __init__(self, mid, role, relation={}, act_record=[]):
-        '''
+        """
         :param relation: {user:relation_num} the relation_num is indicates the intimacy(weight) of the target role
         :param act_record:[(self,action,target)...]
-        '''
+        """
         self._id = mid
         self._role = role
         self._relation = relation
@@ -39,9 +39,9 @@ class Users:
             return None
 
     def get_relation(self, mid=None):
-        '''
+        """
         :return: One list have more triads. e.g.: [(id,role,relation_num),...]
-        '''
+        """
         if mid is not None:
             return [(self.get_set_id(), user.get_set_id(), num)
                     for user, num in self._relation.items() if user.get_set_id() == mid]
@@ -49,11 +49,11 @@ class Users:
                 for user, num in self._relation.items()]
 
     def add_act_record(self, act, target):
-        '''
+        """
         :param act: The action of the current character
         :param target:Action target
         :return:Now action record
-        '''
+        """
         check_user_type(target)
         self._act_record.append((act, target))
         return self._act_record
