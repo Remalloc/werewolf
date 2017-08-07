@@ -1,8 +1,37 @@
 # coding = utf-8
+import functools
 
 
-class Users:
-    def __init__(self, mid, role, relation={}, act_record=[]):
+def type_check(fun):
+    def do_type_check(name, arg):
+        expected_type = fun.__annotations__.get(name, None)
+        if expected_type and not isinstance(arg, expected_type):
+            raise RuntimeError("{} should be of type {} instead of {}"
+                               .format(name, expected_type.__name__, type(arg).__name__))
+
+    @functools.wraps(fun)
+    def wrapper(*args, **kwargs):
+        for i, arg in enumerate(args[:fun.__code__.co_nlocals]):
+            do_type_check(fun.__code__.co_varnames[i], arg)
+        for name, arg in kwargs.items():
+            do_type_check(name, arg)
+        result = fun(*args, **kwargs)
+        do_type_check('return', result)
+        return result
+
+    return wrapper
+
+
+class Models:
+    """
+    All models will extends this class
+    """
+    pass
+
+
+class Users(Models):
+    @type_check
+    def __init__(self, mid: int, role: str, relation: dict = {}, act_record: list = []):
         """
         :param relation: {user:relation_num} the relation_num is indicates the intimacy(weight) of the target role
         :param act_record:[(self,action,target)...]
@@ -12,33 +41,34 @@ class Users:
         self._relation = relation
         self._act_record = act_record
 
-    def get_set_id(self, mid=None):
-        if mid is not None:
-            check_id_type(mid)
+    @type_check
+    def get_set_id(self, mid: int = -1):
+        if mid !=-1:
             self._id = mid
         return self._id
 
-    def get_set_role(self, role=None):
+    @type_check
+    def get_set_role(self, role: str = None):
         if role is not None:
-            check_role_type(role)
             self._role = role
         return self._role
 
-    def add_relation(self, user, default=0):
-        check_user_type(user)
+    @type_check
+    def add_relation(self, user: Models, default: int = 0):
         if not self._relation.get(user):
             self._relation[user] = default
         return self.get_set_id(), user.get_set_id(), self._relation[user]
 
-    def modify_relation(self, user, add_nums):
-        check_user_type(user)
+    @type_check
+    def modify_relation(self, user: Models, add_nums: int):
         if self._relation.get(user):
             self._relation[user] = self._relation.get(user) + add_nums
             return self._relation[user]
         else:
             return None
 
-    def get_relation(self, mid=None):
+    @type_check
+    def get_relation(self, mid: int = None):
         """
         :return: One list have more triads. e.g.: [(id,role,relation_num),...]
         """
@@ -48,39 +78,23 @@ class Users:
         return [(self.get_set_id(), user.get_set_id(), num)
                 for user, num in self._relation.items()]
 
-    def add_act_record(self, act, target):
+    @type_check
+    def add_act_record(self, act: str, target: Models):
         """
         :param act: The action of the current character
         :param target:Action target
         :return:Now action record
         """
-        check_user_type(target)
         self._act_record.append((act, target))
         return self._act_record
 
-    def pop_act_record(self, index=-1):
+    @type_check
+    def pop_act_record(self, index: int = -1):
         result = self._act_record.pop(index)
         return result[0], result[1].get_set_id()
 
-    def get_act_record(self, mid=None):
+    @type_check
+    def get_act_record(self, mid: int = None):
         if mid is not None:
             return [(act, tid.get_set_id()) for act, tid in self._act_record if tid.get_set_id() == mid]
         return [(act, tid.get_set_id()) for act, tid in self._act_record]
-
-
-def check_user_type(user):
-    if not isinstance(user, Users):
-        raise TypeError("The parameter user type must be 'Users'")
-    return True
-
-
-def check_id_type(mid):
-    if not isinstance(mid, int):
-        raise TypeError("The parameter id type must be 'int'")
-    return True
-
-
-def check_role_type(role):
-    if not isinstance(role, str):
-        raise TypeError("The parameter role type must be 'str'")
-    return True
