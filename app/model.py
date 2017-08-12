@@ -1,5 +1,6 @@
 # coding = utf-8
 import functools
+from app.global_list import USER_DB
 
 
 def type_check(fun):
@@ -31,15 +32,16 @@ class Models:
 
 class Users(Models):
     @type_check
-    def __init__(self, mid: int, role: str, relation: dict = {}, act_record: list = []):
+    def __init__(self, mid: int, role: str, relation: dict = None, act_record: list = None):
         """
         :param relation: {user:relation_num} the relation_num is indicates the intimacy(weight) of the target role
         :param act_record:[(self,action,target)...]
         """
         self._id = mid
         self._role = role
-        self._relation = relation
-        self._act_record = act_record
+        self._relation = {} if relation is None else relation
+        self._act_record =[] if act_record is None else act_record
+        USER_DB[mid]=self
 
     @type_check
     def get_set_id(self, mid: int = -1):
