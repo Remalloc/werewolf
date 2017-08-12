@@ -1,0 +1,16 @@
+<RCC>
+    <qresource prefix="/img">
+        <file>img/Acient.png</file>
+        <file>img/Cupid.png</file>
+        <file>img/Hunter.png</file>
+        <file>img/Idiot.png</file>
+        <file>img/Savior.png</file>
+        <file>img/Seer.png</file>
+        <file>img/Sheriff.png</file>
+        <file>img/Thieves.png</file>
+        <file>img/Villagers.png</file>
+        <file>img/Werewolves.png</file>
+        <file>img/White Wolf.png</file>
+        <file>img/Witch.png</file>
+    </qresource>
+</RCC>
