@@ -304,6 +304,8 @@ class Ui_MainWindow(object):
         self.menubar.setObjectName("menubar")
         self.menuFile = QtWidgets.QMenu(self.menubar)
         self.menuFile.setObjectName("menuFile")
+        self.menuGame = QtWidgets.QMenu(self.menubar)
+        self.menuGame.setObjectName("menuGame")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
         self.statusbar.setObjectName("statusbar")
@@ -313,8 +315,14 @@ class Ui_MainWindow(object):
         MainWindow.addToolBar(QtCore.Qt.LeftToolBarArea, self.toolBar)
         self.actionOpen = QtWidgets.QAction(MainWindow)
         self.actionOpen.setObjectName("actionOpen")
-        self.menuFile.addAction(self.actionOpen)
+        self.actionOpenFile = QtWidgets.QAction(MainWindow)
+        self.actionOpenFile.setObjectName("actionOpenFile")
+        self.actionNewGame = QtWidgets.QAction(MainWindow)
+        self.actionNewGame.setObjectName("actionNewGame")
+        self.menuFile.addAction(self.actionOpenFile)
+        self.menuGame.addAction(self.actionNewGame)
         self.menubar.addAction(self.menuFile.menuAction())
+        self.menubar.addAction(self.menuGame.menuAction())
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
@@ -350,8 +358,11 @@ class Ui_MainWindow(object):
         self.prevButton.setText(_translate("MainWindow", "prev"))
         self.nextButton.setText(_translate("MainWindow", "next"))
         self.menuFile.setTitle(_translate("MainWindow", "File"))
+        self.menuGame.setTitle(_translate("MainWindow", "Game"))
         self.toolBar.setWindowTitle(_translate("MainWindow", "toolBar"))
         self.actionOpen.setText(_translate("MainWindow", "Open"))
+        self.actionOpenFile.setText(_translate("MainWindow", "Open"))
+        self.actionNewGame.setText(_translate("MainWindow", "新建对局"))
 
 
 if __name__ == "__main__":
