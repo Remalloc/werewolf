@@ -1,13 +1,11 @@
 # coding = utf-8
 from PyQt5 import QtWidgets, QtCore
 from gui.main_window import Ui_MainWindow
+from gui.game_set_form import Ui_GameSetForm
 import app.global_list
-from app.model import Users
 
 
 class ControlMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
-    # _signal_player:(int:player_id 1~12,str:type rightClick,leftClick)
-    _signal_player = QtCore.pyqtSignal(int)
 
     def __init__(self):
         super(ControlMainWindow, self).__init__()
@@ -18,7 +16,6 @@ class ControlMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
             player = "playerButton_" + str(mid + 1)
             if self.__dict__.get(player):
                 self.__dict__[player].clicked.connect(self.click_player_button)
-                # self._signal_player.connect(self.show_player_record)
 
     def click_player_button(self):
         sender = self.sender()
@@ -47,16 +44,10 @@ class ControlMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
                 self.listWidget.addItem(str(mid)+" "+act+" "+str(obj))
 
 
-if __name__ == "__main__":
-    import sys
+class ControlGameSetForm(QtWidgets.QMainWindow, Ui_GameSetForm):
+    def __init__(self):
+        super(ControlGameSetForm, self).__init__()
+        self.setupUi(self)
 
-    app.global_list.TOTAL_PLAYER = 12
-    user1=Users(1,"wolf")
-    user2=Users(2,"human")
-    user1.add_act_record("against",user2)
-    user1.add_act_record("support",user2)
+        app.global_list.TOTAL_PLAYER=self.totalSetSpinBox.value()
 
-    win = QtWidgets.QApplication(sys.argv)
-    main_window = ControlMainWindow()
-    main_window.show()
-    sys.exit(win.exec_())
