@@ -1,0 +1,113 @@
+# -*- coding: utf-8 -*-
+
+# Form implementation generated from reading ui file 'game_set_form.ui'
+#
+# Created by: PyQt5 UI code generator 5.9
+#
+# WARNING! All changes made in this file will be lost!
+
+from PyQt5 import QtCore, QtGui, QtWidgets
+
+class Ui_GameSetForm(object):
+    def setupUi(self, GameSetForm):
+        GameSetForm.setObjectName("GameSetForm")
+        GameSetForm.resize(652, 457)
+        self.mainLayout = QtWidgets.QGridLayout(GameSetForm)
+        self.mainLayout.setObjectName("mainLayout")
+        self.gridLayout = QtWidgets.QGridLayout()
+        self.gridLayout.setObjectName("gridLayout")
+        self.verticalLayout = QtWidgets.QVBoxLayout()
+        self.verticalLayout.setObjectName("verticalLayout")
+        self.totalSetLayout = QtWidgets.QHBoxLayout()
+        self.totalSetLayout.setObjectName("totalSetLayout")
+        self.totalLabel = QtWidgets.QLabel(GameSetForm)
+        self.totalLabel.setObjectName("totalLabel")
+        self.totalSetLayout.addWidget(self.totalLabel)
+        self.totalSetSpinBox = QtWidgets.QSpinBox(GameSetForm)
+        self.totalSetSpinBox.setMinimum(1)
+        self.totalSetSpinBox.setMaximum(12)
+        self.totalSetSpinBox.setObjectName("totalSetSpinBox")
+        self.totalSetLayout.addWidget(self.totalSetSpinBox)
+        self.totalSetSlider = QtWidgets.QSlider(GameSetForm)
+        self.totalSetSlider.setMinimum(1)
+        self.totalSetSlider.setMaximum(12)
+        self.totalSetSlider.setOrientation(QtCore.Qt.Horizontal)
+        self.totalSetSlider.setObjectName("totalSetSlider")
+        self.totalSetLayout.addWidget(self.totalSetSlider)
+        self.verticalLayout.addLayout(self.totalSetLayout)
+        self.playerSetLayout = QtWidgets.QHBoxLayout()
+        self.playerSetLayout.setObjectName("playerSetLayout")
+        self.listLayout = QtWidgets.QVBoxLayout()
+        self.listLayout.setObjectName("listLayout")
+        self.listLabel = QtWidgets.QLabel(GameSetForm)
+        self.listLabel.setObjectName("listLabel")
+        self.listLayout.addWidget(self.listLabel)
+        self.allPlayerList = QtWidgets.QListWidget(GameSetForm)
+        self.allPlayerList.setObjectName("allPlayerList")
+        self.listLayout.addWidget(self.allPlayerList)
+        self.playerSetLayout.addLayout(self.listLayout)
+        self.controlLayout = QtWidgets.QVBoxLayout()
+        self.controlLayout.setObjectName("controlLayout")
+        self.rightButton = QtWidgets.QPushButton(GameSetForm)
+        self.rightButton.setObjectName("rightButton")
+        self.controlLayout.addWidget(self.rightButton)
+        self.leftButton = QtWidgets.QPushButton(GameSetForm)
+        self.leftButton.setObjectName("leftButton")
+        self.controlLayout.addWidget(self.leftButton)
+        self.addButton = QtWidgets.QPushButton(GameSetForm)
+        self.addButton.setObjectName("addButton")
+        self.controlLayout.addWidget(self.addButton)
+        self.dellButton = QtWidgets.QPushButton(GameSetForm)
+        self.dellButton.setObjectName("dellButton")
+        self.controlLayout.addWidget(self.dellButton)
+        self.playerSetLayout.addLayout(self.controlLayout)
+        self.listLayout_2 = QtWidgets.QVBoxLayout()
+        self.listLayout_2.setObjectName("listLayout_2")
+        self.listLabel_2 = QtWidgets.QLabel(GameSetForm)
+        self.listLabel_2.setObjectName("listLabel_2")
+        self.listLayout_2.addWidget(self.listLabel_2)
+        self.selectPlayerList = QtWidgets.QListWidget(GameSetForm)
+        self.selectPlayerList.setObjectName("selectPlayerList")
+        self.listLayout_2.addWidget(self.selectPlayerList)
+        self.playerSetLayout.addLayout(self.listLayout_2)
+        self.verticalLayout.addLayout(self.playerSetLayout)
+        self.resultLayout = QtWidgets.QHBoxLayout()
+        self.resultLayout.setObjectName("resultLayout")
+        self.defaultButton = QtWidgets.QPushButton(GameSetForm)
+        self.defaultButton.setObjectName("defaultButton")
+        self.resultLayout.addWidget(self.defaultButton)
+        self.determineButton = QtWidgets.QPushButton(GameSetForm)
+        self.determineButton.setObjectName("determineButton")
+        self.resultLayout.addWidget(self.determineButton)
+        self.verticalLayout.addLayout(self.resultLayout)
+        self.gridLayout.addLayout(self.verticalLayout, 0, 0, 1, 1)
+        self.mainLayout.addLayout(self.gridLayout, 0, 0, 1, 1)
+
+        self.retranslateUi(GameSetForm)
+        self.totalSetSlider.valueChanged['int'].connect(self.totalSetSpinBox.setValue)
+        self.totalSetSpinBox.valueChanged['int'].connect(self.totalSetSlider.setValue)
+        QtCore.QMetaObject.connectSlotsByName(GameSetForm)
+
+    def retranslateUi(self, GameSetForm):
+        _translate = QtCore.QCoreApplication.translate
+        GameSetForm.setWindowTitle(_translate("GameSetForm", "GameSetForm"))
+        self.totalLabel.setText(_translate("GameSetForm", "TotalPlayer"))
+        self.listLabel.setText(_translate("GameSetForm", "All Player Type"))
+        self.rightButton.setText(_translate("GameSetForm", ">>"))
+        self.leftButton.setText(_translate("GameSetForm", "<<"))
+        self.addButton.setText(_translate("GameSetForm", "+"))
+        self.dellButton.setText(_translate("GameSetForm", "-"))
+        self.listLabel_2.setText(_translate("GameSetForm", "Select Player Type"))
+        self.defaultButton.setText(_translate("GameSetForm", "Default"))
+        self.determineButton.setText(_translate("GameSetForm", "Determine"))
+
+
+if __name__ == "__main__":
+    import sys
+    app = QtWidgets.QApplication(sys.argv)
+    GameSetForm = QtWidgets.QWidget()
+    ui = Ui_GameSetForm()
+    ui.setupUi(GameSetForm)
+    GameSetForm.show()
+    sys.exit(app.exec_())
+
