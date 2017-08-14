@@ -12,22 +12,24 @@ NOW_PLAYER = 0
 ROLE_TYPE_LIST = []
 ACTION_TYPE = ("strong support", "weak support", "strong against", "weak against")
 
-
-def set_now_player(value: int):
-    global NOW_PLAYER
-    NOW_PLAYER = value
-
+DEFAULT_STYLE='border-image:url(:/img/Unknown);border-radius:10px;'
 
 if exists(PATH_CONFIG):
     import json
+
     try:
-        jsonData = json.load(open(PATH_CONFIG))
+        with open(PATH_CONFIG, 'r') as file:
+            jsonData = json.load(file)
     except IOError:
-        raise IOError('The file(%s) open error'% PATH_CONFIG)
+        raise IOError('The file(%s) open error' % PATH_CONFIG)
 
     all_var = globals()
-    for var, value in jsonData.item():
-        if all_var.get(var):
+    for var, value in jsonData.items():
+        if all_var.get(var) is not None:
             all_var[var] = value
 
+
+def set_now_player(player: int):
+    global NOW_PLAYER
+    NOW_PLAYER = player
 
