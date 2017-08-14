@@ -6,7 +6,6 @@ import app.global_list
 
 
 class ControlMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
-
     def __init__(self):
         super(ControlMainWindow, self).__init__()
         self.setupUi(self)
@@ -23,14 +22,15 @@ class ControlMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         if now_player != 0:
             player = "playerButton_" + str(now_player)
-            self.__dict__[player].setChecked(False)
-        if not sender.isCheckable():
-            sender.setCheckable(True)
-        if not sender.isChecked():
-            sender.setChecked(True)
+            self.__dict__[player].setStyleSheet(app.global_list.DEFAULT_STYLE)
+
+        style_sheet = app.global_list.DEFAULT_STYLE \
+                      + 'border-width:12;'
+        sender.setStyleSheet(style_sheet)
 
         mid = int(sender.objectName().split('_')[1])
         app.global_list.set_now_player(mid)
+
         self.statusBar().showMessage(str(mid) + ' was clicked!')
         self.change_list_widget(mid)
 
@@ -39,9 +39,9 @@ class ControlMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
 
         self.listWidget.clear()
         if user:
-            print(mid,user.get_act_record())
-            for act,obj in user.get_act_record():
-                self.listWidget.addItem(str(mid)+" "+act+" "+str(obj))
+            print(mid, user.get_act_record())
+            for act, obj in user.get_act_record():
+                self.listWidget.addItem(str(mid) + " " + act + " " + str(obj))
 
 
 class ControlGameSetForm(QtWidgets.QMainWindow, Ui_GameSetForm):
@@ -49,5 +49,4 @@ class ControlGameSetForm(QtWidgets.QMainWindow, Ui_GameSetForm):
         super(ControlGameSetForm, self).__init__()
         self.setupUi(self)
 
-        app.global_list.TOTAL_PLAYER=self.totalSetSpinBox.value()
-
+        app.global_list.TOTAL_PLAYER = self.totalSetSpinBox.value()
