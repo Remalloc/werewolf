@@ -20,16 +20,25 @@ class ControlMainWindow(QtWidgets.QMainWindow, Ui_MainWindow):
         sender = self.sender()
         now_player = app.global_list.NOW_PLAYER
 
+        def return_style(user_id):
+            user_db = app.global_list.USER_DB
+            player_style = app.global_list.ROLE_STYLE.get(user_db.get(user_id).get_set_role()
+                                                          if user_db.get(user_id)
+                                                          else None)
+            return player_style
+
         if now_player != 0:
             player = "playerButton_" + str(now_player)
-            self.__dict__[player].setStyleSheet(app.global_list.DEFAULT_STYLE)
-
-        style_sheet = app.global_list.DEFAULT_STYLE \
-                      + 'border-width:12;'
-        sender.setStyleSheet(style_sheet)
-
+            style = return_style(now_player)
+            if style:
+                self.__dict__[player].setStyleSheet(style)
         mid = int(sender.objectName().split('_')[1])
         app.global_list.set_now_player(mid)
+
+        style = return_style(mid)
+        if style:
+            style_sheet = style + 'border-width:12;'
+            sender.setStyleSheet(style_sheet)
 
         self.statusBar().showMessage(str(mid) + ' was clicked!')
         self.change_list_widget(mid)
