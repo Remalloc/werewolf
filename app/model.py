@@ -32,7 +32,7 @@ class Models:
 
 class Users(Models):
     @type_check
-    def __init__(self, mid: int, role: str, relation: dict = None, act_record: list = None):
+    def __init__(self, mid: int, role: str, relation: dict = None, act_record: list = None, accurate: int = 0):
         """
         :param relation: {user:relation_num} the relation_num is indicates the intimacy(weight) of the target role
         :param act_record:[(self,action,target)...]
@@ -40,12 +40,14 @@ class Users(Models):
         self._id = mid
         self._role = role
         self._relation = {} if relation is None else relation
-        self._act_record =[] if act_record is None else act_record
-        USER_DB[mid]=self
+        self._act_record = [] if act_record is None else act_record
+        self._accurate = accurate
+        self._info = [self._id, self._role, self._accurate]
+        USER_DB[mid] = self
 
     @type_check
     def get_set_id(self, mid: int = -1):
-        if mid !=-1:
+        if mid != -1:
             self._id = mid
         return self._id
 
