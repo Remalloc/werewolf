@@ -23,16 +23,9 @@ def type_check(fun):
     return wrapper
 
 
-class Models:
-    """
-    All models will extends this class
-    """
-    pass
-
-
-class Users(Models):
+class Users():
     @type_check
-    def __init__(self, mid: int, role: str, relation: dict = None, act_record: list = None, accurate: int = 0):
+    def __init__(self, mid: int, role: str, relation: dict = None, act_record: list = None, reliable: int = 0):
         """
         :param relation: {user:relation_num} the relation_num is indicates the intimacy(weight) of the target role
         :param act_record:[(self,action,target)...]
@@ -41,8 +34,9 @@ class Users(Models):
         self._role = role
         self._relation = {} if relation is None else relation
         self._act_record = [] if act_record is None else act_record
-        self._accurate = accurate
-        self._info = [self._id, self._role, self._accurate]
+        self._reliable = reliable
+        self._info = {}
+        self._is_dead = False, ''
         USER_DB[mid] = self
 
     @type_check
@@ -58,13 +52,13 @@ class Users(Models):
         return self._role
 
     @type_check
-    def add_relation(self, user: Models, default: int = 0):
+    def add_relation(self, user, default: int = 0):
         if not self._relation.get(user):
             self._relation[user] = default
         return self.get_set_id(), user.get_set_id(), self._relation[user]
 
     @type_check
-    def modify_relation(self, user: Models, add_nums: int):
+    def modify_relation(self, user, add_nums: int):
         if self._relation.get(user):
             self._relation[user] = self._relation.get(user) + add_nums
             return self._relation[user]
@@ -83,10 +77,10 @@ class Users(Models):
                 for user, num in self._relation.items()]
 
     @type_check
-    def add_act_record(self, act: str, target: Models):
+    def add_act_record(self, act: str, target):
         """
         :param act: The action of the current character
-        :param target:Action target
+        :param target:Action target(type is User)
         :return:Now action record
         """
         self._act_record.append((act, target))
@@ -100,5 +94,25 @@ class Users(Models):
     @type_check
     def get_act_record(self, mid: int = None):
         if mid is not None:
-            return [(act, tid.get_set_id()) for act, tid in self._act_record if tid.get_set_id() == mid]
-        return [(act, tid.get_set_id()) for act, tid in self._act_record]
+            return [(act, tid.get_set_id()) for act, tid in list(self._act_record) if tid.get_set_id() == mid]
+        return [(act, tid.get_set_id()) for act, tid in list(self._act_record)]
+
+    @type_check
+    def add_accurate(self, num: int):
+        self._reliable += num
+        return self._reliable
+
+    def get_info(self):
+        def update_info():
+            self._info = {'位置：': self._id,
+                          '角色：': self._role,
+                          '可信度：': self._reliable,
+                          '死亡：': '是 ' if self._is_dead[0] else '否 ' + self._is_dead[1]}
+            return self._info
+
+        return update_info()
+
+    @type_check
+    def kill_player(self, dead_type: str):
+        self._is_dead = True, dead_type
+        return self._is_dead
