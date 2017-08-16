@@ -1,24 +1,28 @@
 # coding = utf-8
 from app.controller import *
+from PyQt5.QtWidgets import QApplication
 import app.global_list
 import gui.img
 
 
 def set_button_icon(btn):
-    btn.setText('')
-    btn.setStyleSheet(app.global_list.DEFAULT_STYLE)
+    btn.setStyleSheet(app.global_list.ROLE_STYLE.get('未知'))
 
 
 def init_win(window: ControlMainWindow):
-    set_button_icon(window.playerButton_1)
+
+    for mid in range(app.global_list.TOTAL_PLAYER):
+        player = "playerButton_" + str(mid + 1)
+        if window.__dict__.get(player):
+            set_button_icon(window.__dict__[player])
 
 
 if __name__ == '__main__':
     import sys
 
-    app.global_list.TOTAL_PLAYER=4
-    win = QtWidgets.QApplication(sys.argv)
+    win = QApplication(sys.argv)
     main_win = ControlMainWindow()
     main_win.show()
     init_win(main_win)
+
     sys.exit(win.exec_())
