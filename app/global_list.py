@@ -14,25 +14,24 @@ ROLE_TYPE_LIST = []
 ACTION_TYPE = ("strong support", "weak support", "strong against", "weak against")
 
 DEFAULT_STYLE = 'border-image:url(%s);border-radius:10px;'
-ROLE_STYLE = {'Werewolves': DEFAULT_STYLE % ':/img/Werewolves',
-              'Villagers': DEFAULT_STYLE % ':/img/Villagers',
-              'Seer': DEFAULT_STYLE % ':/img/Seer',
-              'Cupid': DEFAULT_STYLE % ':/img/Cupid',
-              'Hunter': DEFAULT_STYLE % ':/img/Hunter',
-              'Idiot': DEFAULT_STYLE % ':/img/Idiot',
-              'Savior': DEFAULT_STYLE % ':/img/Savior',
-              'Thieves': DEFAULT_STYLE % ':/img/Thieves',
-              'Ancient': DEFAULT_STYLE % ':/img/Ancient',
-              'White Wolf': DEFAULT_STYLE % ':/img/White Wolf',
-              'Witch': DEFAULT_STYLE % ':/img/Witch',
-              'Sheriff': DEFAULT_STYLE % ':/img/Sheriff',
-              'Unknown': DEFAULT_STYLE % ':/img/Unknown'
+ROLE_STYLE = {'狼人': DEFAULT_STYLE % ':/img/狼人',
+              '村民': DEFAULT_STYLE % ':/img/村民',
+              '预言家': DEFAULT_STYLE % ':/img/预言家',
+              '丘比特': DEFAULT_STYLE % ':/img/丘比特',
+              '猎人': DEFAULT_STYLE % ':/img/猎人',
+              '白痴': DEFAULT_STYLE % ':/img/白痴',
+              '守卫': DEFAULT_STYLE % ':/img/守卫',
+              '盗贼': DEFAULT_STYLE % ':/img/盗贼',
+              '村长': DEFAULT_STYLE % ':/img/村长',
+              '白狼王': DEFAULT_STYLE % ':/img/白狼王',
+              '女巫': DEFAULT_STYLE % ':/img/女巫',
+              '警长': DEFAULT_STYLE % ':/img/警长',
+              '未知': DEFAULT_STYLE % ':/img/未知'
               }
 
 all_var = globals()
 if exists(PATH_CONFIG):
     import json
-
     from app.model import Users
 
     try:
