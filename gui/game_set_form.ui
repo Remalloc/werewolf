@@ -23,7 +23,7 @@
          <item>
           <widget class="QLabel" name="totalLabel">
            <property name="text">
-            <string>TotalPlayer</string>
+            <string>玩家总数</string>
            </property>
           </widget>
          </item>
@@ -59,7 +59,7 @@
            <item>
             <widget class="QLabel" name="listLabel">
              <property name="text">
-              <string>All Player Type</string>
+              <string>所有角色类型</string>
              </property>
             </widget>
            </item>
@@ -105,7 +105,7 @@
            <item>
             <widget class="QLabel" name="listLabel_2">
              <property name="text">
-              <string>Select Player Type</string>
+              <string>选择角色类型</string>
              </property>
             </widget>
            </item>
@@ -121,14 +121,14 @@
          <item>
           <widget class="QPushButton" name="defaultButton">
            <property name="text">
-            <string>Default</string>
+            <string>默认设置</string>
            </property>
           </widget>
          </item>
          <item>
           <widget class="QPushButton" name="determineButton">
            <property name="text">
-            <string>Determine</string>
+            <string>确定</string>
            </property>
           </widget>
          </item>

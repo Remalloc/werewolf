@@ -91,15 +91,15 @@ class Ui_GameSetForm(object):
     def retranslateUi(self, GameSetForm):
         _translate = QtCore.QCoreApplication.translate
         GameSetForm.setWindowTitle(_translate("GameSetForm", "GameSetForm"))
-        self.totalLabel.setText(_translate("GameSetForm", "TotalPlayer"))
-        self.listLabel.setText(_translate("GameSetForm", "All Player Type"))
+        self.totalLabel.setText(_translate("GameSetForm", "玩家总数"))
+        self.listLabel.setText(_translate("GameSetForm", "所有角色类型"))
         self.rightButton.setText(_translate("GameSetForm", ">>"))
         self.leftButton.setText(_translate("GameSetForm", "<<"))
         self.addButton.setText(_translate("GameSetForm", "+"))
         self.dellButton.setText(_translate("GameSetForm", "-"))
-        self.listLabel_2.setText(_translate("GameSetForm", "Select Player Type"))
-        self.defaultButton.setText(_translate("GameSetForm", "Default"))
-        self.determineButton.setText(_translate("GameSetForm", "Determine"))
+        self.listLabel_2.setText(_translate("GameSetForm", "选择角色类型"))
+        self.defaultButton.setText(_translate("GameSetForm", "默认设置"))
+        self.determineButton.setText(_translate("GameSetForm", "确定"))
 
 
 if __name__ == "__main__":
