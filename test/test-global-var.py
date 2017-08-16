@@ -8,14 +8,14 @@ class TestGlobalVar(unittest.TestCase):
         self.PATH_CONFIG = join('..', 'config.json')
 
         self.TOTAL_PLAYER = 3
-        self.USER_DB = {1: 'Werewolves',
-                        2: 'Villagers',
-                        3: 'Seer'}
+        self.USER_DB = {1: '狼人',
+                        2: '村民',
+                        3: '预言家'}
 
         self.NOW_ROUND = 2
         self.NOW_PLAYER = 5
 
-        self.ROLE_TYPE_LIST = ['Werewolves', 'Villagers', 'Seer']
+        self.ROLE_TYPE_LIST = ['狼人', '村民', '预言家']
         self.ACTION_TYPE = ("strong support", "weak support", "strong against", "weak against")
 
     def test_read_config(self):
