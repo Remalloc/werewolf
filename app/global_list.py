@@ -11,6 +11,7 @@ NOW_ROUND = 0
 NOW_PLAYER = 0
 
 ROLE_TYPE_LIST = []
+SPECIAL_ROLE=set(['警长','未知'])
 ACTION_TYPE = ("strong support", "weak support", "strong against", "weak against")
 
 DEFAULT_STYLE = 'border-image:url(%s);border-radius:10px;'
