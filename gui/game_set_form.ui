@@ -64,7 +64,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QListWidget" name="allPlayerList"/>
+            <widget class="QListWidget" name="allRoleList"/>
            </item>
           </layout>
          </item>
@@ -110,7 +110,7 @@
             </widget>
            </item>
            <item>
-            <widget class="QListWidget" name="selectPlayerList"/>
+            <widget class="QListWidget" name="selectRoleList"/>
            </item>
           </layout>
          </item>
