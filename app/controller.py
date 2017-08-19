@@ -1,5 +1,5 @@
 # coding = utf-8
-from PyQt5.QtWidgets import QWidget, QMainWindow, QMessageBox, QListWidget
+from PyQt5.QtWidgets import QWidget, QMainWindow, QMessageBox, QListWidget,QInputDialog,QLineEdit
 from gui.main_window import Ui_MainWindow
 from gui.game_set_form import Ui_GameSetForm
 import app.global_list
@@ -120,10 +120,23 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
                 self.selectRoleList.removeItemWidget(item)
             print(self.select_role)
 
+        def click_add_button():
+            text,flag = QInputDialog.getText(self, "添加自定义角色","角色名字：", QLineEdit.Normal)
+            text=text.strip()
+            if flag and text!='' and len(text) < 15:
+                if text not in self.select_role:
+                    self.select_role.append(text)
+            elif flag:
+                msg = QMessageBox()
+                msg.setWindowTitle("输入错误")
+                msg.setText("名字不能为空且长度不能超过15个字符！")
+                msg.exec()
+
         self.defaultButton.clicked.connect(click_default_button)
         self.determineButton.clicked.connect(click_determine_button)
         self.rightButton.clicked.connect(click_right_button)
         self.leftButton.clicked.connect(click_left_button)
+        self.addButton.clicked.connect(click_add_button)
 
     def init_role_list(self):
         self.allRoleList.setSelectionMode(QListWidget.MultiSelection)
