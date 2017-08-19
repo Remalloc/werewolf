@@ -27,7 +27,8 @@ ROLE_STYLE = {'狼人': DEFAULT_STYLE % ':/img/狼人',
               '白狼王': DEFAULT_STYLE % ':/img/白狼王',
               '女巫': DEFAULT_STYLE % ':/img/女巫',
               '警长': DEFAULT_STYLE % ':/img/警长',
-              '未知': DEFAULT_STYLE % ':/img/未知'
+              '未知': DEFAULT_STYLE % ':/img/未知',
+              '自定义':DEFAULT_STYLE % ':/img/自定义'
               }
 
 all_var = globals()
