@@ -13,5 +13,6 @@
         <file alias="守卫">img/守卫.png</file>
         <file alias="未知">img/未知.png</file>
         <file alias="预言家">img/预言家.png</file>
+        <file alias="自定义">img/自定义.png</file>
     </qresource>
 </RCC>
