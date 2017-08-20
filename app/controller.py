@@ -2,6 +2,7 @@
 from PyQt5.QtWidgets import QWidget, QMainWindow, QMessageBox, QListWidget, QInputDialog, QLineEdit
 from gui.main_window import Ui_MainWindow
 from gui.game_set_form import Ui_GameSetForm
+from app.model import Users
 import app.global_list
 
 main_win = None
@@ -13,13 +14,46 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         global main_win
         main_win = self
-        total_player = app.global_list.TOTAL_PLAYER
-
-        for mid in range(total_player):
-            player = "playerButton_" + str(mid + 1)
-            if self.__dict__.get(player):
-                self.__dict__[player].clicked.connect(self.click_player_button)
+        self.init_player()
         self.newGame.triggered.connect(self.open_new_game)
+
+    def init_player(self):
+        def set_button_icon(btn):
+            btn.setStyleSheet(app.global_list.ROLE_STYLE.get('未知'))
+
+        def btn_lab_enabled(btn,lab):
+            btn.setEnabled(True)
+            lab.setEnabled(True)
+            btn.setFlat(False)
+            lab.show()
+
+        def btn_lab_disabled(btn,lab):
+            btn.setEnabled(False)
+            lab.setEnabled(False)
+            btn.setFlat(True)
+            lab.hide()
+        # init USER_DB
+        app.global_list.USER_DB.clear()
+        for mid in range(app.global_list.TOTAL_PLAYER):
+            Users(mid+1,'未知')
+
+        # set all player icon and connect button function
+        for mid in range(app.global_list.TOTAL_PLAYER):
+            button = "playerButton_" + str(mid + 1)
+            label = "playerLabel_" + str(mid + 1)
+            if self.__dict__.get(button) and self.__dict__.get(label):
+                btn_lab_enabled(self.__dict__[button],
+                                self.__dict__[label])
+                self.__dict__[button].clicked.connect(self.click_player_button)
+                set_button_icon(self.__dict__[button])
+
+        # hide not use player widget
+        for mid in range(app.global_list.TOTAL_PLAYER,12):
+            button = "playerButton_" + str(mid + 1)
+            label = "playerLabel_" + str(mid + 1)
+            if self.__dict__.get(button) and self.__dict__.get(label):
+                btn_lab_disabled(self.__dict__[button],
+                                 self.__dict__[label])
 
     def click_player_button(self):
         sender = self.sender()
@@ -76,7 +110,7 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
         super(ControlGameSetForm, self).__init__()
         self.setupUi(self)
         self.total_player = app.global_list.TOTAL_PLAYER
-        self.select_role = app.global_list.ROLE_TYPE_LIST
+        self.select_role = app.global_list.ROLE_TYPE_LIST[:]
         self.all_role = [role for role in app.global_list.ALL_ROLE if not role in self.select_role ]
         self.init_button_connect()
         self.init_role_list()
@@ -86,9 +120,9 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
             self.total_player=self.totalSetSpinBox.value()
 
         def click_default_button():
-            self.allRoleList.clear()
-            self.init_all_role_list()
-            self.select_role.clear()
+            self.select_role=app.global_list.ROLE_TYPE_LIST[:]
+            self.all_role=[role for role in app.global_list.ALL_ROLE if role not in app.global_list.ROLE_TYPE_LIST]
+            self.update_data()
 
         def click_determine_button():
                 self.close()
@@ -159,9 +193,9 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
     def save_option(self):
         if not self.select_role:
             return False
-
+        self.total_player=self.totalSetSpinBox.value()
         app.global_list.TOTAL_PLAYER = self.total_player
-        app.global_list.ROLE_TYPE_LIST = self.select_role
+        app.global_list.ROLE_TYPE_LIST = self.select_role[:]
         return True
 
     def closeEvent(self, close_event):
@@ -185,5 +219,5 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
                 flag=False
 
         if main_win and flag:
+            main_win.init_player()
             main_win.show()
-

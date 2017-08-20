@@ -4,7 +4,7 @@ import gui.img
 
 PATH_CONFIG = join('.', 'config.json')
 
-TOTAL_PLAYER = 12
+TOTAL_PLAYER = 0
 USER_DB = {}
 
 NOW_ROUND = 0
@@ -31,26 +31,27 @@ ROLE_STYLE = {'狼人': DEFAULT_STYLE % ':/img/狼人',
               '自定义':DEFAULT_STYLE % ':/img/自定义'
               }
 
-all_var = globals()
-if exists(PATH_CONFIG):
-    import json
-    from app.model import Users
 
-    try:
-        with open(PATH_CONFIG, 'r') as file:
-            jsonData = json.load(file)
-    except IOError:
-        raise IOError('The file(%s) open error' % PATH_CONFIG)
+def read_config():
+    all_var = globals()
+    if exists(PATH_CONFIG):
+        import json
+        import app.model
 
-    for var, value in jsonData.items():
-        if all_var.get(var) is not None:
-            if var == 'USER_DB':
-                for mid, role in value.items():
-                    mid = int(mid)
-                    USER_DB[mid] = Users(mid, role)
-            else:
-                all_var[var] = value
+        try:
+            with open(PATH_CONFIG, 'r') as file:
+                jsonData = json.load(file)
+        except IOError:
+            raise IOError('The file(%s) open error' % PATH_CONFIG)
 
+        for var, value in jsonData.items():
+            if all_var.get(var) is not None:
+                if var == 'USER_DB':
+                    for mid, role in value.items():
+                        mid = int(mid)
+                        app.model.Users(mid, role)
+                else:
+                    all_var[var] = value
 
 def set_now_player(player: int):
     global NOW_PLAYER
