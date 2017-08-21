@@ -1,5 +1,7 @@
 # coding = utf-8
-from PyQt5.QtWidgets import QWidget, QMainWindow, QMessageBox, QListWidget, QInputDialog, QLineEdit
+from PyQt5.QtWidgets import QWidget, QMainWindow, QMessageBox, QListWidget, QInputDialog, QLineEdit, QMenu
+from PyQt5.QtCore import Qt
+from PyQt5.QtGui import QCursor
 from gui.main_window import Ui_MainWindow
 from gui.game_set_form import Ui_GameSetForm
 from app.model import Users
@@ -21,23 +23,45 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         def set_button_icon(btn):
             btn.setStyleSheet(app.global_list.ROLE_STYLE.get('未知'))
 
-        def btn_lab_enabled(btn,lab):
+        def set_btn_menu(btn):
+            def create_menu():
+                btn.setContextMenuPolicy(Qt.CustomContextMenu)
+                btn.customContextMenuRequested.connect(show_menu)
+                btn.right_menu = QMenu(self)
+                for role in app.global_list.ROLE_TYPE_LIST:
+                    action = btn.right_menu.addAction(role)
+                    action.triggered.connect(change_role)
+
+            def show_menu():
+                btn.right_menu.exec_(QCursor().pos())
+
+            def change_role():
+                sender = btn.sender()
+                player_id=button_to_mid(btn)
+                player = app.global_list.USER_DB.get(player_id)
+                player.get_set_role(sender.text())
+                btn.setStyleSheet(return_style(player_id))
+
+            create_menu()
+
+        def btn_lab_enabled(btn, lab):
             btn.setEnabled(True)
             lab.setEnabled(True)
             btn.setFlat(False)
             lab.show()
 
-        def btn_lab_disabled(btn,lab):
+        def btn_lab_disabled(btn, lab):
             btn.setEnabled(False)
             lab.setEnabled(False)
             btn.setFlat(True)
             lab.hide()
+
         # init USER_DB
         app.global_list.USER_DB.clear()
         for mid in range(app.global_list.TOTAL_PLAYER):
-            Users(mid+1,'未知')
+            Users(mid + 1, '未知')
 
-        # set all player icon and connect button function
+        # set all player icon,menu and connect button function
         for mid in range(app.global_list.TOTAL_PLAYER):
             button = "playerButton_" + str(mid + 1)
             label = "playerLabel_" + str(mid + 1)
@@ -45,10 +69,11 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
                 btn_lab_enabled(self.__dict__[button],
                                 self.__dict__[label])
                 self.__dict__[button].clicked.connect(self.click_player_button)
+                set_btn_menu(self.__dict__.get(button))
                 set_button_icon(self.__dict__[button])
 
         # hide not use player widget
-        for mid in range(app.global_list.TOTAL_PLAYER,12):
+        for mid in range(app.global_list.TOTAL_PLAYER, 12):
             button = "playerButton_" + str(mid + 1)
             label = "playerLabel_" + str(mid + 1)
             if self.__dict__.get(button) and self.__dict__.get(label):
@@ -59,19 +84,12 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         sender = self.sender()
         now_player = app.global_list.NOW_PLAYER
 
-        def return_style(user_id):
-            user_db = app.global_list.USER_DB
-            player_style = app.global_list.ROLE_STYLE.get(user_db.get(user_id).get_set_role()
-                                                          if user_db.get(user_id)
-                                                          else None)
-            return player_style
-
         if now_player != 0:
             player = "playerButton_" + str(now_player)
             style = return_style(now_player)
             if style:
                 self.__dict__[player].setStyleSheet(style)
-        mid = int(sender.objectName().split('_')[1])
+        mid = button_to_mid(sender)
         app.global_list.set_now_player(mid)
 
         style = return_style(mid)
@@ -105,27 +123,39 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         self.hide()
 
 
+def return_style(user_id):
+    user_db = app.global_list.USER_DB
+    player_style = app.global_list.ROLE_STYLE.get(user_db.get(user_id).get_set_role()
+                                                  if user_db.get(user_id)
+                                                  else None)
+    return player_style
+
+
+def button_to_mid(button):
+    return int(button.objectName().split('_')[1])
+
+
 class ControlGameSetForm(QWidget, Ui_GameSetForm):
     def __init__(self):
         super(ControlGameSetForm, self).__init__()
         self.setupUi(self)
         self.total_player = app.global_list.TOTAL_PLAYER
         self.select_role = app.global_list.ROLE_TYPE_LIST[:]
-        self.all_role = [role for role in app.global_list.ALL_ROLE if not role in self.select_role ]
+        self.all_role = [role for role in app.global_list.ALL_ROLE if not role in self.select_role]
         self.init_button_connect()
         self.init_role_list()
 
     def init_button_connect(self):
         def change_spinbox():
-            self.total_player=self.totalSetSpinBox.value()
+            self.total_player = self.totalSetSpinBox.value()
 
         def click_default_button():
-            self.select_role=app.global_list.ROLE_TYPE_LIST[:]
-            self.all_role=[role for role in app.global_list.ALL_ROLE if role not in app.global_list.ROLE_TYPE_LIST]
+            self.select_role = app.global_list.ROLE_TYPE_LIST[:]
+            self.all_role = [role for role in app.global_list.ALL_ROLE if role not in app.global_list.ROLE_TYPE_LIST]
             self.update_data()
 
         def click_determine_button():
-                self.close()
+            self.close()
 
         def click_right_button():
             role_list = self.allRoleList.selectedItems()
@@ -176,7 +206,7 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
             value = self.total_player
             min_value = self.totalSetSpinBox.minimum()
             max_value = self.totalSetSpinBox.maximum()
-            self.totalSetSpinBox.setValue(value if value in range(min_value - 1, max_value+1) else min_value)
+            self.totalSetSpinBox.setValue(value if value in range(min_value - 1, max_value + 1) else min_value)
 
         def update_all_role():
             self.allRoleList.clear()
@@ -193,13 +223,13 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
     def save_option(self):
         if not self.select_role:
             return False
-        self.total_player=self.totalSetSpinBox.value()
+        self.total_player = self.totalSetSpinBox.value()
         app.global_list.TOTAL_PLAYER = self.total_player
         app.global_list.ROLE_TYPE_LIST = self.select_role[:]
         return True
 
     def closeEvent(self, close_event):
-        flag=True
+        flag = True
         msg = QMessageBox()
         msg.setWindowTitle('保存')
         msg.setText('是否保存设置？')
@@ -216,7 +246,7 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
                 msg.addButton('确定', QMessageBox.YesRole)
                 msg.exec()
                 close_event.ignore()
-                flag=False
+                flag = False
 
         if main_win and flag:
             main_win.init_player()
