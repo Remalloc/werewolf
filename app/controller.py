@@ -1,7 +1,8 @@
 # coding = utf-8
-from PyQt5.QtWidgets import QWidget, QMainWindow, QMessageBox, QListWidget, QInputDialog, QLineEdit, QMenu
+from PyQt5.QtWidgets import QWidget, QMainWindow, QMessageBox, QListWidget, \
+    QInputDialog, QLineEdit, QMenu, QAction, QLabel
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QCursor
+from PyQt5.QtGui import QCursor, QIcon, QPixmap
 from gui.main_window import Ui_MainWindow
 from gui.game_set_form import Ui_GameSetForm
 from app.model import Users
@@ -17,6 +18,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         global main_win
         main_win = self
         self.init_player()
+        self.init_tool_bar()
         self.newGame.triggered.connect(self.open_new_game)
 
     def init_player(self):
@@ -37,10 +39,12 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
 
             def change_role():
                 sender = btn.sender()
-                player_id=button_to_mid(btn)
+                player_id = button_to_mid(btn)
                 player = app.global_list.USER_DB.get(player_id)
                 player.get_set_role(sender.text())
                 btn.setStyleSheet(return_style(player_id))
+                if button_to_mid(btn)==app.global_list.NOW_PLAYER:
+                    btn.clicked.emit()
 
             create_menu()
 
@@ -65,20 +69,23 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         for mid in range(app.global_list.TOTAL_PLAYER):
             button = "playerButton_" + str(mid + 1)
             label = "playerLabel_" + str(mid + 1)
-            if self.__dict__.get(button) and self.__dict__.get(label):
-                btn_lab_enabled(self.__dict__[button],
-                                self.__dict__[label])
-                self.__dict__[button].clicked.connect(self.click_player_button)
-                set_btn_menu(self.__dict__.get(button))
-                set_button_icon(self.__dict__[button])
+            player_button=self.__dict__.get(button)
+            player_label=self.__dict__.get(label)
+            if player_button and player_label:
+                btn_lab_enabled(player_button,player_label)
+                player_button.disconnect()
+                player_button.clicked.connect(self.click_player_button)
+                set_btn_menu(player_button)
+                set_button_icon(player_button)
 
         # hide not use player widget
         for mid in range(app.global_list.TOTAL_PLAYER, 12):
             button = "playerButton_" + str(mid + 1)
             label = "playerLabel_" + str(mid + 1)
-            if self.__dict__.get(button) and self.__dict__.get(label):
-                btn_lab_disabled(self.__dict__[button],
-                                 self.__dict__[label])
+            player_button = self.__dict__.get(button)
+            player_label = self.__dict__.get(label)
+            if player_button and player_label:
+                btn_lab_disabled(player_button,player_label)
 
     def click_player_button(self):
         sender = self.sender()
@@ -97,7 +104,6 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
             style_sheet = style + 'border-width:12;'
             sender.setStyleSheet(style_sheet)
 
-        self.statusBar().showMessage(str(mid) + ' was clicked!')
         self.update_player_info(mid)
 
     def update_player_info(self, mid: int):
@@ -117,6 +123,29 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         update_info_list()
         update_record_list()
 
+    def init_tool_bar(self):
+        def click_sheriff():
+            now_player = app.global_list.NOW_PLAYER
+            if now_player != 0:
+                lab = self.__dict__['playerLabel_' + str(now_player)]
+                sheriff_lab = str(lab_to_mid(lab)) + "号" + " (警长)"
+                if self.__dict__.get('sheriff'):
+                    default_lab = str(lab_to_mid(self.sheriff)) + "号"
+                    if lab == self.sheriff:
+                        lab.setText(default_lab)
+                        self.sheriff = None
+                    else:
+                        self.sheriff.setText(default_lab)
+                        lab.setText(sheriff_lab)
+                        self.sheriff = lab
+                else:
+                    lab.setText(sheriff_lab)
+                    self.sheriff = lab
+
+        sheriff = QAction(QIcon(':/img/警长'), '设置选择玩家为警长', self)
+        sheriff.triggered.connect(click_sheriff)
+        self.toolBar.addAction(sheriff)
+
     def open_new_game(self):
         new_game = ControlGameSetForm()
         new_game.show()
@@ -128,11 +157,17 @@ def return_style(user_id):
     player_style = app.global_list.ROLE_STYLE.get(user_db.get(user_id).get_set_role()
                                                   if user_db.get(user_id)
                                                   else None)
+    if not player_style:
+        player_style = app.global_list.ROLE_STYLE.get('自定义')
     return player_style
 
 
 def button_to_mid(button):
     return int(button.objectName().split('_')[1])
+
+
+def lab_to_mid(label):
+    return int(label.objectName().split('_')[1])
 
 
 class ControlGameSetForm(QWidget, Ui_GameSetForm):
@@ -176,7 +211,8 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
             self.update_data()
 
         def click_add_button():
-            text, flag = QInputDialog.getText(self, "添加自定义角色", "角色名字：", QLineEdit.Normal)
+            text, flag = QInputDialog.getText(self, "添加自定义角色", "角色名字(不能为空且长度小于15)：",
+                                              QLineEdit.Normal)
             text = text.strip()
             if flag and text != '' and len(text) < 15:
                 if text not in self.select_role:
