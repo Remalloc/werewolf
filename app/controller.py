@@ -1,22 +1,36 @@
 # coding = utf-8
 from PyQt5.QtWidgets import QWidget, QMainWindow, QMessageBox, QListWidget, \
-    QInputDialog, QLineEdit, QMenu, QAction, QLabel
+    QInputDialog, QLineEdit, QMenu, QAction
 from PyQt5.QtCore import Qt
-from PyQt5.QtGui import QCursor, QIcon, QPixmap
+from PyQt5.QtGui import QCursor, QIcon
 from gui.main_window import Ui_MainWindow
 from gui.game_set_form import Ui_GameSetForm
 from app.model import Users
 import app.global_list
 
-main_win = None
+MAIN_WIN = None
+NORMAL_EVENT = 1
+TARGET_EVENT = 2
+CLICK_EVENT = NORMAL_EVENT
+EVENT = None
+
+
+def change_click_event(event_type):
+    global CLICK_EVENT
+    CLICK_EVENT = event_type
+
+
+def change_event(event):
+    global EVENT
+    EVENT = event
 
 
 class ControlMainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super(ControlMainWindow, self).__init__()
         self.setupUi(self)
-        global main_win
-        main_win = self
+        global MAIN_WIN
+        MAIN_WIN = self
         self.init_player()
         self.init_tool_bar()
         self.newGame.triggered.connect(self.open_new_game)
@@ -43,7 +57,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
                 player = app.global_list.USER_DB.get(player_id)
                 player.get_set_role(sender.text())
                 btn.setStyleSheet(return_style(player_id))
-                if button_to_mid(btn)==app.global_list.NOW_PLAYER:
+                if button_to_mid(btn) == app.global_list.NOW_PLAYER:
                     btn.clicked.emit()
 
             create_menu()
@@ -69,12 +83,13 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         for mid in range(app.global_list.TOTAL_PLAYER):
             button = "playerButton_" + str(mid + 1)
             label = "playerLabel_" + str(mid + 1)
-            player_button=self.__dict__.get(button)
-            player_label=self.__dict__.get(label)
+            player_button = self.__dict__.get(button)
+            player_label = self.__dict__.get(label)
             if player_button and player_label:
-                btn_lab_enabled(player_button,player_label)
+                btn_lab_enabled(player_button, player_label)
                 player_button.disconnect()
                 player_button.clicked.connect(self.click_player_button)
+                player_button.clicked.connect(self.click_target_player)
                 set_btn_menu(player_button)
                 set_button_icon(player_button)
 
@@ -85,26 +100,46 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
             player_button = self.__dict__.get(button)
             player_label = self.__dict__.get(label)
             if player_button and player_label:
-                btn_lab_disabled(player_button,player_label)
+                btn_lab_disabled(player_button, player_label)
 
     def click_player_button(self):
-        sender = self.sender()
-        now_player = app.global_list.NOW_PLAYER
+        if CLICK_EVENT == NORMAL_EVENT:
+            sender = self.sender()
+            now_player = app.global_list.NOW_PLAYER
 
-        if now_player != 0:
-            player = "playerButton_" + str(now_player)
-            style = return_style(now_player)
+            if now_player != 0:
+                player = "playerButton_" + str(now_player)
+                style = return_style(now_player)
+                if style:
+                    self.__dict__[player].setStyleSheet(style)
+            mid = button_to_mid(sender)
+            app.global_list.set_now_player(mid)
+
+            style = return_style(mid)
             if style:
-                self.__dict__[player].setStyleSheet(style)
-        mid = button_to_mid(sender)
-        app.global_list.set_now_player(mid)
+                style_sheet = style + 'border-width:12;'
+                sender.setStyleSheet(style_sheet)
 
-        style = return_style(mid)
-        if style:
-            style_sheet = style + 'border-width:12;'
-            sender.setStyleSheet(style_sheet)
+            self.update_player_info(mid)
 
-        self.update_player_info(mid)
+    def click_target_player(self):
+        if CLICK_EVENT == TARGET_EVENT:
+            user_db = app.global_list.USER_DB
+            now_player = app.global_list.NOW_PLAYER
+            player = user_db.get(now_player)
+            target_player = user_db.get(button_to_mid(self.sender()))
+
+            player.add_act_record(EVENT, target_player)
+            self.update_player_info(now_player)
+            self.cancel_target()
+
+    def cancel_target(self):
+        change_click_event(NORMAL_EVENT)
+        change_event(None)
+        self.unsetCursor()
+
+    def mouseReleaseEvent(self, *args, **kwargs):
+        self.cancel_target()
 
     def update_player_info(self, mid: int):
         user = app.global_list.USER_DB.get(mid)
@@ -112,7 +147,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         def update_record_list():
             self.recordList.clear()
             for act, obj in user.get_act_record():
-                self.recordList.addItem(str(mid) + " " + act + " " + str(obj))
+                self.recordList.addItem(str(mid) + "号" + " " + act + " " + str(obj) + "号")
 
         def update_info_list():
             self.infoList.clear()
@@ -142,9 +177,47 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
                     lab.setText(sheriff_lab)
                     self.sheriff = lab
 
-        sheriff = QAction(QIcon(':/img/警长'), '设置选择玩家为警长', self)
+        def check_player():
+            now_player = app.global_list.NOW_PLAYER
+            if now_player != 0:
+                self.setCursor(Qt.CrossCursor)
+                change_click_event(TARGET_EVENT)
+                return True
+            return False
+
+        def click_strong_support():
+            if check_player():
+                change_event('明捞')
+
+        def click_weak_support():
+            if check_player():
+                change_event('暗捞')
+
+        def click_strong_against():
+            if check_player():
+                change_event('重踩')
+
+        def click_weak_against():
+            if check_player():
+                change_event('轻踩')
+
+        sheriff = QAction(QIcon(':/img/警长'), '设置选择玩家为警长', self.toolBar)
+        strong_support = QAction(QIcon(':/img/明捞'), '选择当前玩家的明捞对象', self.toolBar)
+        weak_support=QAction(QIcon(':/img/暗捞'), '选择当前玩家的暗捞对象', self.toolBar)
+        weak_against = QAction(QIcon(':/img/轻踩'), '选择当前玩家的轻踩对象', self.toolBar)
+        strong_against=QAction(QIcon(':/img/重踩'), '选择当前玩家的重踩对象', self.toolBar)
+
         sheriff.triggered.connect(click_sheriff)
+        strong_support.triggered.connect(click_strong_support)
+        weak_support.triggered.connect(click_weak_support)
+        weak_against.triggered.connect(click_weak_against)
+        strong_against.triggered.connect(click_strong_against)
+
         self.toolBar.addAction(sheriff)
+        self.toolBar.addAction(strong_support)
+        self.toolBar.addAction(weak_support)
+        self.toolBar.addAction(weak_against)
+        self.toolBar.addAction(strong_against)
 
     def open_new_game(self):
         new_game = ControlGameSetForm()
@@ -284,6 +357,6 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
                 close_event.ignore()
                 flag = False
 
-        if main_win and flag:
-            main_win.init_player()
-            main_win.show()
+        if MAIN_WIN and flag:
+            MAIN_WIN.init_player()
+            MAIN_WIN.show()
