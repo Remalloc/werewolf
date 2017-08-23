@@ -25,56 +25,66 @@ def type_check(fun):
 
 class Users():
     @type_check
-    def __init__(self, mid: int, role: str, relation: dict = None, act_record: list = None, reliable: int = 0):
+    def __init__(self, mid: int, role: str):
         """
         :param relation: {user:relation_num} the relation_num is indicates the intimacy(weight) of the target role
         :param act_record:[(self,action,target)...]
         """
         self._id = mid
         self._role = role
-        self._relation = {} if relation is None else relation
-        self._act_record = [] if act_record is None else act_record
-        self._reliable = reliable
+        self._relation = {}
+        self._act_record = []
+        self._reliable = 0
+        self._vote = []
         self._info = {}
-        self._is_dead = False, ''
+        self._dead = False, ''
         USER_DB[mid] = self
 
-    @type_check
-    def get_set_id(self, mid: int = -1):
-        if mid != -1:
-            self._id = mid
+    @property
+    def id(self):
         return self._id
 
-    @type_check
-    def get_set_role(self, role: str = None):
-        if role is not None:
-            self._role = role
+    @id.setter
+    def id(self, mid: int):
+        self._id = mid
+
+    @property
+    def role(self):
         return self._role
 
-    @type_check
-    def add_relation(self, user, default: int = 0):
-        if not self._relation.get(user):
-            self._relation[user] = default
-        return self.get_set_id(), user.get_set_id(), self._relation[user]
+    @role.setter
+    def role(self, role: str = None):
+        if role is not None:
+            self._role = role
+
+    @property
+    def relation(self):
+        return [(self.id, user.id, value) for user, value in self._relation.items()]
 
     @type_check
-    def modify_relation(self, user, add_nums: int):
+    def add_relation(self, user, value: int = 0):
+        if not self._relation.get(user):
+            self._relation[user] = value
+        return value
+
+    @type_check
+    def modify_relation(self, user, value: int):
         if self._relation.get(user):
-            self._relation[user] = self._relation.get(user) + add_nums
-            return self._relation[user]
+            self._relation[user] = value
+            return value
         else:
             return None
 
     @type_check
-    def get_relation(self, mid: int = None):
-        """
-        :return: One list have more triads. e.g.: [(id,role,relation_num),...]
-        """
-        if mid is not None:
-            return [(self.get_set_id(), user.get_set_id(), num)
-                    for user, num in self._relation.items() if user.get_set_id() == mid]
-        return [(self.get_set_id(), user.get_set_id(), num)
-                for user, num in self._relation.items()]
+    def find_relation(self, mid: int):
+        for user, value in self.relation:
+            if user.id == mid:
+                return value
+        return None
+
+    @property
+    def act_record(self):
+        return [(act, obj.id) for act, obj in list(self._act_record)]
 
     @type_check
     def add_act_record(self, act: str, target):
@@ -88,31 +98,55 @@ class Users():
 
     @type_check
     def pop_act_record(self, index: int = -1):
-        result = self._act_record.pop(index)
-        return result[0], result[1].get_set_id()
+        return self._act_record.pop(index)
 
     @type_check
-    def get_act_record(self, mid: int = None):
-        if mid is not None:
-            return [(act, tid.get_set_id()) for act, tid in list(self._act_record) if tid.get_set_id() == mid]
-        return [(act, tid.get_set_id()) for act, tid in list(self._act_record)]
+    def find_record(self, mid: int):
+        for act, obj in list(self._act_record):
+            if obj.id == mid:
+                return act, obj
+        return None
 
-    @type_check
-    def add_accurate(self, num: int):
-        self._reliable += num
+    @property
+    def reliable(self):
         return self._reliable
 
-    def get_info(self):
-        def update_info():
-            self._info = {'位置：': self._id,
-                          '角色：': self._role,
-                          '可信度：': self._reliable,
-                          '死亡：': '是 ' if self._is_dead[0] else '否 ' + self._is_dead[1]}
-            return self._info
-
-        return update_info()
+    @reliable.setter
+    def reliable(self, value: int):
+        self._reliable = value
 
     @type_check
-    def kill_player(self, dead_type: str):
-        self._is_dead = True, dead_type
-        return self._is_dead
+    def add_reliable(self, value: int):
+        self._reliable += value
+        return self._reliable
+
+    @property
+    def dead(self):
+        return self._dead
+
+    @dead.setter
+    def dead(self, *args):
+        if len(args) != 2:
+            raise AttributeError("Function dead(args) must have 2 parameters")
+        if isinstance(args[0], bool):
+            raise TypeError("First parameter type is not bool")
+        if isinstance(args[1], str):
+            raise TypeError("Second parameter type is not str")
+        self._dead = args
+
+    @property
+    def info(self):
+        self._info = {'位置：': self._id,
+                      '角色：': self._role,
+                      '可信度：': self._reliable,
+                      '死亡：': '是 ' if self._dead[0] else '否 ' + self._dead[1]}
+        return self._info
+
+    @property
+    def vote(self):
+        return self._vote
+
+    @type_check
+    def add_vote(self, mid: int):
+        self._vote.append(mid)
+        return mid
