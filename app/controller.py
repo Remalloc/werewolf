@@ -6,23 +6,46 @@ from PyQt5.QtGui import QCursor, QIcon
 from gui.main_window import Ui_MainWindow
 from gui.game_set_form import Ui_GameSetForm
 from app.model import Users
-import app.global_list
+from app.global_list import *
+import functools
+from enum import Enum, auto, unique
+
+
+@unique
+class EventType(Enum):
+    NORMAL_EVENT = auto()
+    TARGET_EVENT = auto()
+    VOTE_EVENT = auto()
+    SHERIFF_EVENT = auto()
+
 
 MAIN_WIN = None
-NORMAL_EVENT = 1
-TARGET_EVENT = 2
-CLICK_EVENT = NORMAL_EVENT
+CLICK_EVENT = EventType.NORMAL_EVENT
 EVENT = None
+ROUND_VOTE = {}
 
 
-def change_click_event(event_type):
+def change_click_event(event_type: EventType):
     global CLICK_EVENT
     CLICK_EVENT = event_type
 
 
-def change_event(event):
+def change_event(event: tuple):
     global EVENT
     EVENT = event
+
+
+def clear_event():
+    global EVENT
+    EVENT = None
+
+
+def add_vote(mid, vote):
+    global ROUND_VOTE
+    if ROUND_VOTE.get(mid):
+        ROUND_VOTE[mid].append(vote)
+    else:
+        ROUND_VOTE[mid] = [vote]
 
 
 class ControlMainWindow(QMainWindow, Ui_MainWindow):
@@ -37,14 +60,14 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
 
     def init_player(self):
         def set_button_icon(btn):
-            btn.setStyleSheet(app.global_list.ROLE_STYLE.get('未知'))
+            btn.setStyleSheet(get_role_style('未知'))
 
         def set_btn_menu(btn):
             def create_menu():
                 btn.setContextMenuPolicy(Qt.CustomContextMenu)
                 btn.customContextMenuRequested.connect(show_menu)
                 btn.right_menu = QMenu(self)
-                for role in app.global_list.ROLE_TYPE_LIST:
+                for role in get_role_type():
                     action = btn.right_menu.addAction(role)
                     action.triggered.connect(change_role)
 
@@ -54,10 +77,10 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
             def change_role():
                 sender = btn.sender()
                 player_id = button_to_mid(btn)
-                player = app.global_list.USER_DB.get(player_id)
-                player.get_set_role(sender.text())
+                player = get_user_db(player_id)
+                player.role = sender.text()
                 btn.setStyleSheet(return_style(player_id))
-                if button_to_mid(btn) == app.global_list.NOW_PLAYER:
+                if button_to_mid(btn) == get_now_player():
                     btn.clicked.emit()
 
             create_menu()
@@ -71,16 +94,17 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         def btn_lab_disabled(btn, lab):
             btn.setEnabled(False)
             lab.setEnabled(False)
+            btn.setStyleSheet('')
             btn.setFlat(True)
             lab.hide()
 
-        # init USER_DB
-        app.global_list.USER_DB.clear()
-        for mid in range(app.global_list.TOTAL_PLAYER):
+        # Init USER_DB
+        clear_user_db()
+        for mid in range(get_total_player()):
             Users(mid + 1, '未知')
 
-        # set all player icon,menu and connect button function
-        for mid in range(app.global_list.TOTAL_PLAYER):
+        # Set all player icon,menu and connect button function
+        for mid in range(get_total_player()):
             button = "playerButton_" + str(mid + 1)
             label = "playerLabel_" + str(mid + 1)
             player_button = self.__dict__.get(button)
@@ -94,7 +118,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
                 set_button_icon(player_button)
 
         # hide not use player widget
-        for mid in range(app.global_list.TOTAL_PLAYER, 12):
+        for mid in range(get_total_player(), 12):
             button = "playerButton_" + str(mid + 1)
             label = "playerLabel_" + str(mid + 1)
             player_button = self.__dict__.get(button)
@@ -103,9 +127,9 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
                 btn_lab_disabled(player_button, player_label)
 
     def click_player_button(self):
-        if CLICK_EVENT == NORMAL_EVENT:
+        if CLICK_EVENT == EventType.NORMAL_EVENT:
             sender = self.sender()
-            now_player = app.global_list.NOW_PLAYER
+            now_player = get_now_player()
 
             if now_player != 0:
                 player = "playerButton_" + str(now_player)
@@ -113,7 +137,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
                 if style:
                     self.__dict__[player].setStyleSheet(style)
             mid = button_to_mid(sender)
-            app.global_list.set_now_player(mid)
+            set_now_player(mid)
 
             style = return_style(mid)
             if style:
@@ -123,35 +147,57 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
             self.update_player_info(mid)
 
     def click_target_player(self):
-        if CLICK_EVENT == TARGET_EVENT:
-            user_db = app.global_list.USER_DB
-            now_player = app.global_list.NOW_PLAYER
-            player = user_db.get(now_player)
-            target_player = user_db.get(button_to_mid(self.sender()))
+        now_player = get_now_player()
+        sender = get_user_db(now_player)
+        recipient = get_user_db(button_to_mid(self.sender()))
 
-            player.add_act_record(EVENT, target_player)
+        if CLICK_EVENT == EventType.TARGET_EVENT:
+            sender.add_act_record(EVENT[0], recipient)
             self.update_player_info(now_player)
+
+        elif CLICK_EVENT == EventType.VOTE_EVENT:
+            sender.add_act_record(EVENT[0], recipient)
+            recipient.add_act_record(EVENT[1], sender)
+            recipient.add_vote(sender.id)
+            add_vote(sender.id, recipient.id)
+            self.update_player_info(now_player)
+
+        elif CLICK_EVENT == EventType.SHERIFF_EVENT:
+            lab = self.__dict__['playerLabel_' + str(recipient.id)]
+            sheriff_lab = str(lab_to_mid(lab)) + "号" + " (警长)"
+            if self.__dict__.get('sheriff'):
+                default_lab = str(lab_to_mid(self.sheriff)) + "号"
+                if lab == self.sheriff:
+                    lab.setText(default_lab)
+                    self.sheriff = None
+                else:
+                    self.sheriff.setText(default_lab)
+                    lab.setText(sheriff_lab)
+                    self.sheriff = lab
+            else:
+                lab.setText(sheriff_lab)
+                self.sheriff = lab
             self.cancel_target()
 
     def cancel_target(self):
-        change_click_event(NORMAL_EVENT)
-        change_event(None)
+        change_click_event(EventType.NORMAL_EVENT)
+        clear_event()
         self.unsetCursor()
 
     def mouseReleaseEvent(self, *args, **kwargs):
         self.cancel_target()
 
     def update_player_info(self, mid: int):
-        user = app.global_list.USER_DB.get(mid)
+        user = get_user_db(mid)
 
         def update_record_list():
             self.recordList.clear()
-            for act, obj in user.get_act_record():
+            for act, obj in user.act_record:
                 self.recordList.addItem(str(mid) + "号" + " " + act + " " + str(obj) + "号")
 
         def update_info_list():
             self.infoList.clear()
-            info = user.get_info()
+            info = user.info
             for name, value in info.items():
                 self.infoList.addItem(name + str(value))
 
@@ -159,65 +205,73 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         update_record_list()
 
     def init_tool_bar(self):
+        def check_player(fun):
+            @functools.wraps(fun)
+            def wrapper():
+                if get_now_player() != 0:
+                    self.setCursor(Qt.CrossCursor)
+                    fun()
+
+            return wrapper
+
+        @check_player
         def click_sheriff():
-            now_player = app.global_list.NOW_PLAYER
-            if now_player != 0:
-                lab = self.__dict__['playerLabel_' + str(now_player)]
-                sheriff_lab = str(lab_to_mid(lab)) + "号" + " (警长)"
-                if self.__dict__.get('sheriff'):
-                    default_lab = str(lab_to_mid(self.sheriff)) + "号"
-                    if lab == self.sheriff:
-                        lab.setText(default_lab)
-                        self.sheriff = None
-                    else:
-                        self.sheriff.setText(default_lab)
-                        lab.setText(sheriff_lab)
-                        self.sheriff = lab
-                else:
-                    lab.setText(sheriff_lab)
-                    self.sheriff = lab
+            change_click_event(EventType.SHERIFF_EVENT)
+            change_event(('警长', ''))
 
-        def check_player():
-            now_player = app.global_list.NOW_PLAYER
-            if now_player != 0:
-                self.setCursor(Qt.CrossCursor)
-                change_click_event(TARGET_EVENT)
-                return True
-            return False
-
+        @check_player
         def click_strong_support():
-            if check_player():
-                change_event('明捞')
+            change_click_event(EventType.TARGET_EVENT)
+            change_event(('明捞', '被明捞'))
 
+        @check_player
         def click_weak_support():
-            if check_player():
-                change_event('暗捞')
+            change_click_event(EventType.TARGET_EVENT)
+            change_event(('暗捞', '被暗捞'))
 
+        @check_player
         def click_strong_against():
-            if check_player():
-                change_event('重踩')
+            change_click_event(EventType.TARGET_EVENT)
+            change_event(('重踩', '被重踩'))
 
+        @check_player
         def click_weak_against():
-            if check_player():
-                change_event('轻踩')
+            change_click_event(EventType.TARGET_EVENT)
+            change_event(('轻踩', '被轻踩'))
 
-        sheriff = QAction(QIcon(':/img/警长'), '设置选择玩家为警长', self.toolBar)
-        strong_support = QAction(QIcon(':/img/明捞'), '选择当前玩家的明捞对象', self.toolBar)
-        weak_support=QAction(QIcon(':/img/暗捞'), '选择当前玩家的暗捞对象', self.toolBar)
-        weak_against = QAction(QIcon(':/img/轻踩'), '选择当前玩家的轻踩对象', self.toolBar)
-        strong_against=QAction(QIcon(':/img/重踩'), '选择当前玩家的重踩对象', self.toolBar)
+        @check_player
+        def click_vote():
+            change_click_event(EventType.VOTE_EVENT)
+            change_event(('收到投票', '投票给'))
 
-        sheriff.triggered.connect(click_sheriff)
-        strong_support.triggered.connect(click_strong_support)
-        weak_support.triggered.connect(click_weak_support)
-        weak_against.triggered.connect(click_weak_against)
-        strong_against.triggered.connect(click_strong_against)
+        def create_action(icon, desc):
+            return QAction(QIcon(icon), desc, self.toolBar)
 
-        self.toolBar.addAction(sheriff)
-        self.toolBar.addAction(strong_support)
-        self.toolBar.addAction(weak_support)
-        self.toolBar.addAction(weak_against)
-        self.toolBar.addAction(strong_against)
+        def triggered_connect(*args):
+            for tri, con in args:
+                tri.triggered.connect(con)
+
+        def toolbar_add_actions(*args):
+            for act in args:
+                self.toolBar.addAction(act)
+
+        sheriff = create_action(':/img/警长', '设置选择玩家为警长')
+        strong_support = create_action(':/img/明捞', '选择当前玩家的明捞对象')
+        weak_support = create_action(':/img/暗捞', '选择当前玩家的暗捞对象')
+        weak_against = create_action(':/img/轻踩', '选择当前玩家的轻踩对象')
+        strong_against = create_action(':/img/重踩', '选择当前玩家的重踩对象')
+        vote = create_action(':/img/投票', '选择给当前玩家投票的对象')
+
+        triggered_connect((sheriff, click_sheriff),
+                          (strong_support, click_strong_support),
+                          (weak_support, click_weak_support),
+                          (weak_against, click_weak_against),
+                          (strong_against, click_strong_against),
+                          (vote, click_vote))
+
+        toolbar_add_actions(sheriff, strong_support,
+                            weak_support, weak_against,
+                            strong_against, vote)
 
     def open_new_game(self):
         new_game = ControlGameSetForm()
@@ -225,31 +279,13 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         self.hide()
 
 
-def return_style(user_id):
-    user_db = app.global_list.USER_DB
-    player_style = app.global_list.ROLE_STYLE.get(user_db.get(user_id).get_set_role()
-                                                  if user_db.get(user_id)
-                                                  else None)
-    if not player_style:
-        player_style = app.global_list.ROLE_STYLE.get('自定义')
-    return player_style
-
-
-def button_to_mid(button):
-    return int(button.objectName().split('_')[1])
-
-
-def lab_to_mid(label):
-    return int(label.objectName().split('_')[1])
-
-
 class ControlGameSetForm(QWidget, Ui_GameSetForm):
     def __init__(self):
         super(ControlGameSetForm, self).__init__()
         self.setupUi(self)
-        self.total_player = app.global_list.TOTAL_PLAYER
-        self.select_role = app.global_list.ROLE_TYPE_LIST[:]
-        self.all_role = [role for role in app.global_list.ALL_ROLE if not role in self.select_role]
+        self.total_player = get_total_player()
+        self.select_role = get_role_type()[:]
+        self.all_role = [role for role in get_all_role() if role not in self.select_role]
         self.init_button_connect()
         self.init_role_list()
 
@@ -258,8 +294,8 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
             self.total_player = self.totalSetSpinBox.value()
 
         def click_default_button():
-            self.select_role = app.global_list.ROLE_TYPE_LIST[:]
-            self.all_role = [role for role in app.global_list.ALL_ROLE if role not in app.global_list.ROLE_TYPE_LIST]
+            self.select_role = get_role_type()[:]
+            self.all_role = [role for role in get_all_role() if role not in get_role_type()]
             self.update_data()
 
         def click_determine_button():
@@ -290,7 +326,7 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
             if flag and text != '' and len(text) < 15:
                 if text not in self.select_role:
                     self.select_role.append(text)
-                    app.global_list.ALL_ROLE.append(text)
+                    add_all_role(text)
                     self.update_data()
             elif flag:
                 msg = QMessageBox()
@@ -333,8 +369,8 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
         if not self.select_role:
             return False
         self.total_player = self.totalSetSpinBox.value()
-        app.global_list.TOTAL_PLAYER = self.total_player
-        app.global_list.ROLE_TYPE_LIST = self.select_role[:]
+        set_total_player(self.total_player)
+        set_role_type(self.select_role[:])
         return True
 
     def closeEvent(self, close_event):
@@ -360,3 +396,20 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
         if MAIN_WIN and flag:
             MAIN_WIN.init_player()
             MAIN_WIN.show()
+
+
+def return_style(user_id):
+    player_style = get_role_style(get_user_db(user_id).role
+                                  if get_user_db(user_id)
+                                  else None)
+    if not player_style:
+        player_style = get_role_style('自定义')
+    return player_style
+
+
+def button_to_mid(button):
+    return int(button.objectName().split('_')[1])
+
+
+def lab_to_mid(label):
+    return int(label.objectName().split('_')[1])
