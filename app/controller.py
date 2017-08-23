@@ -113,7 +113,6 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
                 btn_lab_enabled(player_button, player_label)
                 player_button.disconnect()
                 player_button.clicked.connect(self.click_player_button)
-                player_button.clicked.connect(self.click_target_player)
                 set_btn_menu(player_button)
                 set_button_icon(player_button)
 
@@ -143,41 +142,9 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
             if style:
                 style_sheet = style + 'border-width:12;'
                 sender.setStyleSheet(style_sheet)
-
             self.update_player_info(mid)
-
-    def click_target_player(self):
-        now_player = get_now_player()
-        sender = get_user_db(now_player)
-        recipient = get_user_db(button_to_mid(self.sender()))
-
-        if CLICK_EVENT == EventType.TARGET_EVENT:
-            sender.add_act_record(EVENT[0], recipient)
-            self.update_player_info(now_player)
-
-        elif CLICK_EVENT == EventType.VOTE_EVENT:
-            sender.add_act_record(EVENT[0], recipient)
-            recipient.add_act_record(EVENT[1], sender)
-            recipient.add_vote(sender.id)
-            add_vote(sender.id, recipient.id)
-            self.update_player_info(now_player)
-
-        elif CLICK_EVENT == EventType.SHERIFF_EVENT:
-            lab = self.__dict__['playerLabel_' + str(recipient.id)]
-            sheriff_lab = str(lab_to_mid(lab)) + "号" + " (警长)"
-            if self.__dict__.get('sheriff'):
-                default_lab = str(lab_to_mid(self.sheriff)) + "号"
-                if lab == self.sheriff:
-                    lab.setText(default_lab)
-                    self.sheriff = None
-                else:
-                    self.sheriff.setText(default_lab)
-                    lab.setText(sheriff_lab)
-                    self.sheriff = lab
-            else:
-                lab.setText(sheriff_lab)
-                self.sheriff = lab
-            self.cancel_target()
+        else:
+            self.toolbar_act()
 
     def cancel_target(self):
         change_click_event(EventType.NORMAL_EVENT)
@@ -272,6 +239,42 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         toolbar_add_actions(sheriff, strong_support,
                             weak_support, weak_against,
                             strong_against, vote)
+
+    def toolbar_act(self):
+        now_player = get_now_player()
+        sender = get_user_db(now_player)
+        recipient = get_user_db(button_to_mid(self.sender()))
+
+        if CLICK_EVENT is EventType.TARGET_EVENT:
+            sender.add_act_record(EVENT[0], recipient)
+            self.update_player_info(now_player)
+
+        elif CLICK_EVENT is EventType.VOTE_EVENT:
+            if sender.id == recipient.id:
+                self.cancel_target()
+                return
+            sender.add_act_record(EVENT[0], recipient)
+            recipient.add_act_record(EVENT[1], sender)
+            recipient.add_vote(sender.id)
+            add_vote(sender.id, recipient.id)
+            self.update_player_info(now_player)
+
+        elif CLICK_EVENT is EventType.SHERIFF_EVENT:
+            lab = self.__dict__['playerLabel_' + str(recipient.id)]
+            sheriff_lab = str(lab_to_mid(lab)) + "号" + " (警长)"
+            if self.__dict__.get('sheriff'):
+                default_lab = str(lab_to_mid(self.sheriff)) + "号"
+                if lab == self.sheriff:
+                    lab.setText(default_lab)
+                    self.sheriff = None
+                else:
+                    self.sheriff.setText(default_lab)
+                    lab.setText(sheriff_lab)
+                    self.sheriff = lab
+            else:
+                lab.setText(sheriff_lab)
+                self.sheriff = lab
+            self.cancel_target()
 
     def open_new_game(self):
         new_game = ControlGameSetForm()
