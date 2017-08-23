@@ -1,6 +1,6 @@
 <RCC>
   <qresource prefix="/img" lang="zh_CN">
-    <file alias="投票">img/死亡.png</file>
+    <file alias="死亡">img/死亡.png</file>
     <file alias="投票">img/投票.png</file>
     <file alias="暗捞">img/暗捞.png</file>
     <file alias="明捞">img/明捞.png</file>
