@@ -17,6 +17,7 @@ class EventType(Enum):
     TARGET_EVENT = auto()
     VOTE_EVENT = auto()
     SHERIFF_EVENT = auto()
+    DEAD_EVENT = auto()
 
 
 MAIN_WIN = None
@@ -211,6 +212,11 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
             change_click_event(EventType.VOTE_EVENT)
             change_event(('收到投票', '投票给'))
 
+        @check_player
+        def click_dead():
+            change_click_event(EventType.DEAD_EVENT)
+            change_event((dead,))
+
         def create_action(icon, desc):
             return QAction(QIcon(icon), desc, self.toolBar)
 
@@ -228,22 +234,29 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         weak_against = create_action(':/img/轻踩', '选择当前玩家的轻踩对象')
         strong_against = create_action(':/img/重踩', '选择当前玩家的重踩对象')
         vote = create_action(':/img/投票', '选择给当前玩家投票的对象')
+        dead = create_action(':/img/死亡', '选择死亡玩家')
 
         triggered_connect((sheriff, click_sheriff),
                           (strong_support, click_strong_support),
                           (weak_support, click_weak_support),
                           (weak_against, click_weak_against),
                           (strong_against, click_strong_against),
-                          (vote, click_vote))
+                          (vote, click_vote),
+                          (dead, click_dead))
 
-        toolbar_add_actions(sheriff, strong_support,
-                            weak_support, weak_against,
-                            strong_against, vote)
+        toolbar_add_actions(sheriff, strong_support, weak_support,
+                            weak_against, strong_against, vote,
+                            dead)
 
     def toolbar_act(self):
         now_player = get_now_player()
         sender = get_user_db(now_player)
-        recipient = get_user_db(button_to_mid(self.sender()))
+        btn = self.sender()
+        recipient = get_user_db(button_to_mid(btn))
+        if sender.dead[0] or (recipient.dead[0] and CLICK_EVENT is not EventType.DEAD_EVENT):
+            self.cancel_target()
+            print("no")
+            return
 
         if CLICK_EVENT is EventType.TARGET_EVENT:
             sender.add_act_record(EVENT[0], recipient)
@@ -275,6 +288,26 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
                 lab.setText(sheriff_lab)
                 self.sheriff = lab
             self.cancel_target()
+
+        elif CLICK_EVENT is EventType.DEAD_EVENT:
+            tool = EVENT[0]
+
+            def create_menu():
+                tool.menu = QMenu(self)
+                for dead in DEAD_TYPE:
+                    action = tool.menu.addAction(dead)
+                    action.triggered.connect(change_dead)
+                show_menu()
+
+            def show_menu():
+                tool.menu.exec_(QCursor().pos())
+
+            def change_dead():
+                dead_type = self.sender().text()
+                recipient.dead = True, dead_type
+                btn.setStyleSheet()
+
+            create_menu()
 
     def open_new_game(self):
         new_game = ControlGameSetForm()
