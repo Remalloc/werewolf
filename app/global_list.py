@@ -14,6 +14,7 @@ NOW_PLAYER = 0
 ROLE_TYPE = []
 ALL_ROLE = ['狼人', '村民', '预言家', '丘比特', '猎人', '白痴', '守卫', '盗贼', '村长', '白狼王', '女巫']
 ACTION_TYPE = ("明捞", "暗捞", "重踩", "轻踩")
+DEAD_TYPE = ('未知', '中刀', '中毒', '中枪', '流放', '链接')
 
 DEFAULT_STYLE = 'border-image:url(%s);border-radius:10px;'
 ROLE_STYLE = {'狼人': DEFAULT_STYLE % ':/img/狼人',
