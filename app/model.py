@@ -125,12 +125,12 @@ class Users():
         return self._dead
 
     @dead.setter
-    def dead(self, *args):
+    def dead(self, args):
         if len(args) != 2:
-            raise AttributeError("Function dead(args) must have 2 parameters")
-        if isinstance(args[0], bool):
-            raise TypeError("First parameter type is not bool")
-        if isinstance(args[1], str):
+            raise AttributeError("Function dead(args) have %s parameters not 2" % len(args))
+        if not isinstance(args[0], bool):
+            raise TypeError("First parameter %s is not bool" % type(args[0]))
+        if not isinstance(args[1], str):
             raise TypeError("Second parameter type is not str")
         self._dead = args
 
