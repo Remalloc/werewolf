@@ -7,6 +7,6 @@ if __name__ == '__main__':
     import sys
 
     win = QApplication(sys.argv)
-    main_win = ControlMainWindow()
-    main_win.show()
+    MAIN_WIN = ControlMainWindow()
+    MAIN_WIN.show()
     sys.exit(win.exec_())
