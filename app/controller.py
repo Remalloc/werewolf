@@ -249,22 +249,36 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
                             dead)
 
     def toolbar_act(self):
+        """
+        Calling this function completes the current toolbar event,
+        the event type is EventType(global enum),
+        current event is CLICK_EVENT(global var)
+        """
         now_player = get_now_player()
         sender = get_user_db(now_player)
         btn = self.sender()
         recipient = get_user_db(button_to_mid(btn))
+
+        # To determine whether the player is dead
         if sender.dead[0] or (recipient.dead[0] and CLICK_EVENT is not EventType.DEAD_EVENT):
             self.cancel_target()
-            print("no")
             return
 
+        def is_self():
+            if sender.id == recipient.id:
+                self.cancel_target()
+                return True
+            return False
+
+        # Determine the type of event
         if CLICK_EVENT is EventType.TARGET_EVENT:
+            if is_self():
+                return
             sender.add_act_record(EVENT[0], recipient)
             self.update_player_info(now_player)
 
         elif CLICK_EVENT is EventType.VOTE_EVENT:
-            if sender.id == recipient.id:
-                self.cancel_target()
+            if is_self():
                 return
             sender.add_act_record(EVENT[0], recipient)
             recipient.add_act_record(EVENT[1], sender)
