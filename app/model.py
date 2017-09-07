@@ -102,10 +102,11 @@ class Users():
 
     @type_check
     def find_record(self, mid: int):
+        result = []
         for act, obj in list(self._act_record):
             if obj.id == mid:
-                return act, obj
-        return None
+                result.append((act, obj))
+        return result
 
     @property
     def reliable(self):
@@ -122,7 +123,7 @@ class Users():
 
     @property
     def dead(self):
-        return self._dead
+        return self._dead[0]
 
     @dead.setter
     def dead(self, args):
@@ -139,7 +140,7 @@ class Users():
         self._info = {'位置：': self._id,
                       '角色：': self._role,
                       '可信度：': self._reliable,
-                      '死亡：': '是 ' if self._dead[0] else '否 ' + self._dead[1]}
+                      '死亡：': '是 ' + self._dead[1] if self._dead[0] else '否 '}
         return self._info
 
     @property

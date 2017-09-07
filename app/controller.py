@@ -1,10 +1,11 @@
 # coding = utf-8
-from PyQt5.QtWidgets import QWidget, QMainWindow, QMessageBox, QListWidget, \
-    QInputDialog, QLineEdit, QMenu, QAction
+from PyQt5.QtWidgets import QWidget, QDialog, QMainWindow, QMessageBox, QListWidget, \
+    QInputDialog, QLineEdit, QMenu, QAction, QCheckBox, QVBoxLayout
 from PyQt5.QtCore import Qt
 from PyQt5.QtGui import QCursor, QIcon
 from gui.main_window import Ui_MainWindow
 from gui.game_set_form import Ui_GameSetForm
+from gui.filter_dialog import Ui_FliterDialog
 from app.model import Users
 from app.global_list import *
 import functools
@@ -58,6 +59,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         self.init_player()
         self.init_tool_bar()
         self.newGame.triggered.connect(self.open_new_game)
+        self.filterButton.clicked.connect(self.click_filter_button)
 
     def init_player(self):
         def set_button_icon(btn):
@@ -117,7 +119,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
                 set_btn_menu(player_button)
                 set_button_icon(player_button)
 
-        # hide not use player widget
+        # Hide not use player widget
         for mid in range(get_total_player(), 12):
             button = "playerButton_" + str(mid + 1)
             label = "playerLabel_" + str(mid + 1)
@@ -258,11 +260,14 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         sender = get_user_db(now_player)
         btn = self.sender()
         recipient = get_user_db(button_to_mid(btn))
+        recipient_lab = self.__dict__['playerLabel_' + str(recipient.id)]
 
         # To determine whether the player is dead
-        if sender.dead[0] or (recipient.dead[0] and CLICK_EVENT is not EventType.DEAD_EVENT):
-            self.cancel_target()
-            return
+        if CLICK_EVENT is not EventType.DEAD_EVENT:
+            if sender.dead or recipient.dead:
+                self.cancel_target()
+                print("dead")
+                return
 
         def is_self():
             if sender.id == recipient.id:
@@ -287,20 +292,19 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
             self.update_player_info(now_player)
 
         elif CLICK_EVENT is EventType.SHERIFF_EVENT:
-            lab = self.__dict__['playerLabel_' + str(recipient.id)]
-            sheriff_lab = str(lab_to_mid(lab)) + "号" + " (警长)"
+            sheriff_lab = str(lab_to_mid(recipient_lab)) + "号" + " (警长)"
             if self.__dict__.get('sheriff'):
                 default_lab = str(lab_to_mid(self.sheriff)) + "号"
-                if lab == self.sheriff:
-                    lab.setText(default_lab)
+                if recipient_lab == self.sheriff:
+                    recipient_lab.setText(default_lab)
                     self.sheriff = None
                 else:
                     self.sheriff.setText(default_lab)
-                    lab.setText(sheriff_lab)
-                    self.sheriff = lab
+                    recipient_lab.setText(sheriff_lab)
+                    self.sheriff = recipient_lab
             else:
-                lab.setText(sheriff_lab)
-                self.sheriff = lab
+                recipient_lab.setText(sheriff_lab)
+                self.sheriff = recipient_lab
             self.cancel_target()
 
         elif CLICK_EVENT is EventType.DEAD_EVENT:
@@ -317,16 +321,23 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
                 tool.menu.exec_(QCursor().pos())
 
             def change_dead():
+                dead_lab = str(lab_to_mid(recipient_lab)) + "号" + " (死亡)"
+                recipient_lab.setText(dead_lab)
                 dead_type = self.sender().text()
                 recipient.dead = True, dead_type
-                btn.setStyleSheet()
 
             create_menu()
+            self.cancel_target()
+            self.update_player_info(recipient.id)
 
     def open_new_game(self):
         new_game = ControlGameSetForm()
         new_game.show()
         self.hide()
+
+    def click_filter_button(self):
+        filter_dialog = FilterDialog()
+        filter_dialog.exec()
 
 
 class ControlGameSetForm(QWidget, Ui_GameSetForm):
@@ -463,3 +474,80 @@ def button_to_mid(button):
 
 def lab_to_mid(label):
     return int(label.objectName().split('_')[1])
+
+
+class FilterDialog(QDialog, Ui_FliterDialog):
+    def __init__(self):
+        super(FilterDialog, self).__init__()
+        self.setupUi(self)
+        self.total_player = get_total_player()
+        self.now_player = get_user_db(get_now_player())
+        self.init_items()
+        self.init_button()
+
+    def init_items(self):
+        if not self.now_player:
+            return
+        group_box = self.playerList
+        button_box = QVBoxLayout()
+        if self.now_player.__dict__.get('filter_list'):
+            for index, choose in self.now_player.filter_list:
+                check_box = QCheckBox(str(index) + "号")
+                check_box.setObjectName(str(index))
+                check_box.setChecked(choose)
+                check_box.stateChanged.connect(self.check_box_changed)
+                button_box.addWidget(check_box)
+        else:
+            self.now_player.filter_list = []
+            for index in range(self.total_player):
+                result = self.now_player.find_record(index + 1)
+                if result:
+                    check_box = QCheckBox(group_box)
+                    check_box.setObjectName(str(index + 1))
+                    check_box.setText(str(index + 1) + "号")
+                    check_box.setChecked(True)
+                    check_box.stateChanged.connect(self.check_box_changed)
+                    button_box.addWidget(check_box)
+                    self.now_player.filter_list.append((index + 1, True))
+        group_box.setLayout(button_box)
+
+    def init_button(self):
+        self.selectAllButton.clicked.connect(self.click_all_select)
+        self.determineButton.clicked.connect(self.click_determine_button)
+        self.antiElectionButton.clicked.connect(self.click_anti_election)
+
+    def click_determine_button(self):
+        MAIN_WIN.update_player_info(get_now_player())
+        record_list = MAIN_WIN.recordList
+        filter_list = self.now_player.filter_list
+        record_list.clear()
+        for act, obj in self.now_player.act_record:
+            if (obj,True) in filter_list:
+                record_list.addItem(str(get_now_player()) + "号" + " " + act + " " + str(obj) + "号")
+        self.close()
+
+    def click_cancel_button(self):
+        pass
+
+    def click_all_select(self):
+        for check_box in self.playerList.children():
+            if isinstance(check_box, QCheckBox):
+                check_box.setChecked(True)
+
+    def click_anti_election(self):
+        for check_box in self.playerList.children():
+            if isinstance(check_box, QCheckBox):
+                check_box.setChecked(False)
+
+    def check_box_changed(self):
+        sender = self.sender()
+        mid = int(sender.objectName())
+        filter_list = self.now_player.filter_list
+        if isinstance(sender, QCheckBox):
+            if sender.isChecked():
+                if (mid, False) in filter_list:
+                    index = self.now_player.filter_list.index((mid, False))
+                    self.now_player.filter_list[index] = (mid, True)
+            elif (mid, True) in filter_list:
+                index = self.now_player.filter_list.index((mid, True))
+                self.now_player.filter_list[index] = (mid, False)
