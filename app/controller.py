@@ -173,6 +173,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
 
         update_info_list()
         update_record_list()
+        update_filter()
 
     def init_tool_bar(self):
         def check_player(fun):
@@ -336,6 +337,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         self.hide()
 
     def click_filter_button(self):
+        self.cancel_target()
         filter_dialog = FilterDialog()
         filter_dialog.exec()
 
@@ -517,13 +519,7 @@ class FilterDialog(QDialog, Ui_FliterDialog):
         self.antiElectionButton.clicked.connect(self.click_anti_election)
 
     def click_determine_button(self):
-        MAIN_WIN.update_player_info(get_now_player())
-        record_list = MAIN_WIN.recordList
-        filter_list = self.now_player.filter_list
-        record_list.clear()
-        for act, obj in self.now_player.act_record:
-            if (obj,True) in filter_list:
-                record_list.addItem(str(get_now_player()) + "号" + " " + act + " " + str(obj) + "号")
+        update_filter()
         self.close()
 
     def click_cancel_button(self):
@@ -551,3 +547,22 @@ class FilterDialog(QDialog, Ui_FliterDialog):
             elif (mid, True) in filter_list:
                 index = self.now_player.filter_list.index((mid, True))
                 self.now_player.filter_list[index] = (mid, False)
+
+
+def update_filter():
+    now_player = get_user_db(get_now_player())
+    MAIN_WIN.filterButton.setText("筛选")
+    if not now_player or not now_player.__dict__.get('filter_list'):
+        return
+    record_list = MAIN_WIN.recordList
+    filter_list = now_player.filter_list
+
+    record_list.clear()
+    flag = False
+    for act, obj in now_player.act_record:
+        if (obj, True) in filter_list:
+            record_list.addItem(str(get_now_player()) + "号" + " " + act + " " + str(obj) + "号")
+        else:
+            flag = True
+    if flag:
+        MAIN_WIN.filterButton.setText("筛选*")
