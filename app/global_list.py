@@ -6,7 +6,6 @@ PATH_CONFIG = join('.', 'config.json')
 
 TOTAL_PLAYER = 0
 USER_DB = {}
-
 NOW_ROUND = 0
 NOW_PLAYER = 0
 
@@ -14,7 +13,6 @@ ROLE_TYPE = []
 ALL_ROLE = ['狼人', '村民', '预言家', '丘比特', '猎人', '白痴', '守卫', '盗贼', '村长', '白狼王', '女巫']
 ACTION_TYPE = ("明捞", "暗捞", "重踩", "轻踩")
 DEAD_TYPE = ('未知', '中刀', '中毒', '中枪', '流放', '链接')
-
 DEFAULT_STYLE = 'border-image:url(%s);border-radius:10px;'
 ROLE_STYLE = {'狼人': DEFAULT_STYLE % ':/img/狼人',
               '村民': DEFAULT_STYLE % ':/img/村民',
@@ -30,6 +28,13 @@ ROLE_STYLE = {'狼人': DEFAULT_STYLE % ':/img/狼人',
               '未知': DEFAULT_STYLE % ':/img/未知',
               '自定义': DEFAULT_STYLE % ':/img/自定义'
               }
+
+DEFAULT_THRESHOLD = 2.5
+DEFAULT_WEAK_SUPPORT_RANGE = 0.5
+DEFAULT_WEAK_OPPOSE_RANGE = 0.5
+DEFAULT_STRONG_SUPPORT_RANGE = 1
+DEFAULT_STRONG_OPPOSE_RANGE = 1
+DEFAULT_VOTE_RANGE = 2
 
 
 def read_config():
