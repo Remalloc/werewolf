@@ -5,7 +5,6 @@ import gui.img
 PATH_CONFIG = join('.', 'config.json')
 
 TOTAL_PLAYER = 0
-RECORD_VOTE = []
 USER_DB = {}
 
 NOW_ROUND = 0
@@ -75,6 +74,10 @@ def set_now_player(mid: int):
 
 def get_user_db(user: int):
     return USER_DB.get(user)
+
+
+def get_all_user_db():
+    return USER_DB
 
 
 def add_user_db(mid: int, user):

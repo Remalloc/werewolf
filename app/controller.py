@@ -24,7 +24,6 @@ class EventType(Enum):
 MAIN_WIN = None
 CLICK_EVENT = EventType.NORMAL_EVENT
 EVENT = None
-ROUND_VOTE = {}
 
 
 def change_click_event(event_type: EventType):
@@ -42,14 +41,6 @@ def clear_event():
     EVENT = None
 
 
-def add_vote(mid, vote):
-    global ROUND_VOTE
-    if ROUND_VOTE.get(mid):
-        ROUND_VOTE[mid].append(vote)
-    else:
-        ROUND_VOTE[mid] = [vote]
-
-
 class ControlMainWindow(QMainWindow, Ui_MainWindow):
     def __init__(self):
         super(ControlMainWindow, self).__init__()
@@ -59,6 +50,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         self.init_player()
         self.init_tool_bar()
         self.newGame.triggered.connect(self.open_new_game)
+        self.viewVote.triggered.connect(self.view_vote)
         self.filterButton.clicked.connect(self.click_filter_button)
 
     def init_player(self):
@@ -288,8 +280,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
                 return
             sender.add_act_record(EVENT[0], recipient)
             recipient.add_act_record(EVENT[1], sender)
-            recipient.add_vote(sender.id)
-            add_vote(sender.id, recipient.id)
+            sender.add_vote(recipient.id)
             self.update_player_info(now_player)
 
         elif CLICK_EVENT is EventType.SHERIFF_EVENT:
@@ -335,6 +326,22 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         new_game = ControlGameSetForm()
         new_game.show()
         self.hide()
+
+    def view_vote(self):
+        user_db = get_all_user_db()
+        result = []
+        for user in user_db.values():
+            if user.vote:
+                string = str(user.id) + ' ← ' + ' '.join(str(i) for i in user.vote)
+                result.append(string)
+        msg = QMessageBox(self)
+        msg.setWindowTitle("投票结果")
+        msg.setIcon(QMessageBox.Information)
+        msg.setText('\n'.join(result))
+        msg.exec()
+
+    def analyse_team(self):
+        pass
 
     def click_filter_button(self):
         self.cancel_target()
