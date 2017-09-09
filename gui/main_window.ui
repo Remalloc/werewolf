@@ -510,8 +510,17 @@
      <string>对局</string>
     </property>
     <addaction name="newGame"/>
+    <addaction name="teamAnalysis"/>
+    <addaction name="viewVote"/>
+   </widget>
+   <widget class="QMenu" name="menu">
+    <property name="title">
+     <string>高级</string>
+    </property>
+    <addaction name="setDefault"/>
    </widget>
    <addaction name="menuGame"/>
+   <addaction name="menu"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -540,9 +549,22 @@
     <string>新建对局</string>
    </property>
   </action>
+  <action name="teamAnalysis">
+   <property name="text">
+    <string>团队分析</string>
+   </property>
+  </action>
+  <action name="viewVote">
+   <property name="text">
+    <string>查看投票</string>
+   </property>
+  </action>
+  <action name="setDefault">
+   <property name="text">
+    <string>默认值设置</string>
+   </property>
+  </action>
  </widget>
- <resources>
-  <include location="img.qrc"/>
- </resources>
+ <resources/>
  <connections/>
 </ui>
