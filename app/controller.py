@@ -6,10 +6,12 @@ from PyQt5.QtGui import QCursor, QIcon
 from gui.main_window import Ui_MainWindow
 from gui.game_set_form import Ui_GameSetForm
 from gui.filter_dialog import Ui_FliterDialog
+from gui.default_option import Ui_defaultOption
 from app.model import Users
 from app.global_list import *
 import functools
 from enum import Enum, auto, unique
+from operator import itemgetter
 
 
 @unique
@@ -51,6 +53,8 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         self.init_tool_bar()
         self.newGame.triggered.connect(self.open_new_game)
         self.viewVote.triggered.connect(self.view_vote)
+        self.setDefault.triggered.connect(self.open_set_default)
+        self.teamAnalysis.triggered.connect(self.analyse_team)
         self.filterButton.clicked.connect(self.click_filter_button)
 
     def init_player(self):
@@ -180,32 +184,32 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         @check_player
         def click_sheriff():
             change_click_event(EventType.SHERIFF_EVENT)
-            change_event(('警长', ''))
+            change_event(('警长', 'sheriff'))
 
         @check_player
         def click_strong_support():
             change_click_event(EventType.TARGET_EVENT)
-            change_event(('明捞', '被明捞'))
+            change_event(('明捞', 'strongSupport'))
 
         @check_player
         def click_weak_support():
             change_click_event(EventType.TARGET_EVENT)
-            change_event(('暗捞', '被暗捞'))
+            change_event(('暗捞', 'weakSupport'))
 
         @check_player
         def click_strong_against():
             change_click_event(EventType.TARGET_EVENT)
-            change_event(('重踩', '被重踩'))
+            change_event(('重踩', 'strongOppose'))
 
         @check_player
         def click_weak_against():
             change_click_event(EventType.TARGET_EVENT)
-            change_event(('轻踩', '被轻踩'))
+            change_event(('轻踩', 'weakOppose'))
 
         @check_player
         def click_vote():
             change_click_event(EventType.VOTE_EVENT)
-            change_event(('收到投票', '投票给'))
+            change_event(('收到投票', 'vote'))
 
         @check_player
         def click_dead():
@@ -254,6 +258,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         btn = self.sender()
         recipient = get_user_db(button_to_mid(btn))
         recipient_lab = self.__dict__['playerLabel_' + str(recipient.id)]
+        default_range = get_default_range()
 
         # To determine whether the player is dead
         if CLICK_EVENT is not EventType.DEAD_EVENT:
@@ -273,13 +278,13 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
             if is_self():
                 return
             sender.add_act_record(EVENT[0], recipient)
+            sender.add_relation(recipient, default_range[EVENT[1]])
             self.update_player_info(now_player)
 
         elif CLICK_EVENT is EventType.VOTE_EVENT:
             if is_self():
                 return
             sender.add_act_record(EVENT[0], recipient)
-            recipient.add_act_record(EVENT[1], sender)
             sender.add_vote(recipient.id)
             self.update_player_info(now_player)
 
@@ -328,44 +333,82 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         self.hide()
 
     def view_vote(self):
+        self.cancel_target()
         user_db = get_all_user_db()
         result = []
         for user in user_db.values():
             if user.vote:
                 string = str(user.id) + ' ← ' + ' '.join(str(i) for i in user.vote)
                 result.append(string)
-        msg = QMessageBox(self)
-        msg.setWindowTitle("投票结果")
-        msg.setIcon(QMessageBox.Information)
-        msg.setText('\n'.join(result))
-        msg.exec()
+        show_tip_msg(self, "投票结果", '\n'.join(result))
 
     def analyse_team(self):
-        pass
+        def get_max(member):
+            max_value = max(member.relation, key=itemgetter(1))[1] if member.relation else 0
+            if max_value < default_range['teamThreshold']:
+                return None
+            return {mid: value for mid, value in member.relation if value == max_value}
+
+        def get_min(member):
+            min_value = min(member.relation, key=itemgetter(1)) if member.relation else 0
+            if min_value > -default_range['teamThreshold']:
+                return None
+            return {mid: value for mid, value in member.relation if value == min_value}
+
+        def add_member(team: list, all_member: dict):
+            if not all_member:
+                return
+            for mid, value in all_member.items():
+                member = get_user_db(mid)
+
+        def filter_member(team: list):
+            for member_id in team:
+                member = get_user_db(member_id)
+                min_value = min(member.relation, key=itemgetter(1))
+                if min_value[1] < 0:
+                    team.remove(min_value[0])
+
+        self.cancel_target()
+        all_team = []
+        users = get_all_user_db()
+        default_range = get_default_range()
+        for user in users.values():
+            all_users = functools.reduce(lambda x, y: x + y, all_team) if all_team else []
+            user = get_max(user)
+            if not [x for x in user.keys() if x in all_users]:
+                now_team = []
+                add_member(now_team, user)
+                all_team.append(now_team)
+        print(all_team)
 
     def click_filter_button(self):
         self.cancel_target()
         filter_dialog = FilterDialog()
         filter_dialog.exec()
 
+    def open_set_default(self):
+        self.cancel_target()
+        default_option = DefaultOption()
+        default_option.exec()
+
 
 class ControlGameSetForm(QWidget, Ui_GameSetForm):
     def __init__(self):
         super(ControlGameSetForm, self).__init__()
         self.setupUi(self)
-        self.total_player = get_total_player()
-        self.select_role = get_role_type()[:]
-        self.all_role = [role for role in get_all_role() if role not in self.select_role]
+        self._total_player = get_total_player()
+        self._select_role = get_role_type()[:]
+        self._all_role = [role for role in get_all_role() if role not in self._select_role]
         self.init_button_connect()
         self.init_role_list()
 
     def init_button_connect(self):
         def change_spinbox():
-            self.total_player = self.totalSetSpinBox.value()
+            self._total_player = self.totalSetSpinBox.value()
 
         def click_default_button():
-            self.select_role = get_role_type()[:]
-            self.all_role = [role for role in get_all_role() if role not in get_role_type()]
+            self._select_role = get_role_type()[:]
+            self._all_role = [role for role in get_all_role() if role not in get_role_type()]
             self.update_data()
 
         def click_determine_button():
@@ -376,8 +419,8 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
             for item in role_list:
                 index = self.allRoleList.row(item)
                 item_text = self.allRoleList.takeItem(index).text()
-                self.select_role.append(item_text)
-                self.all_role.remove(item_text)
+                self._select_role.append(item_text)
+                self._all_role.remove(item_text)
             self.update_data()
 
         def click_left_button():
@@ -385,8 +428,8 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
             for item in role_list:
                 index = self.selectRoleList.row(item)
                 item_text = self.selectRoleList.takeItem(index).text()
-                self.all_role.append(item_text)
-                self.select_role.remove(item_text)
+                self._all_role.append(item_text)
+                self._select_role.remove(item_text)
             self.update_data()
 
         def click_add_button():
@@ -394,8 +437,8 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
                                               QLineEdit.Normal)
             text = text.strip()
             if flag and text != '' and len(text) < 15:
-                if text not in self.select_role:
-                    self.select_role.append(text)
+                if text not in self._select_role:
+                    self._select_role.append(text)
                     add_all_role(text)
                     self.update_data()
             elif flag:
@@ -418,40 +461,34 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
 
     def update_data(self):
         def update_total():
-            value = self.total_player
+            value = self._total_player
             min_value = self.totalSetSpinBox.minimum()
             max_value = self.totalSetSpinBox.maximum()
             self.totalSetSpinBox.setValue(value if value in range(min_value - 1, max_value + 1) else min_value)
 
         def update_all_role():
             self.allRoleList.clear()
-            self.allRoleList.addItems(self.all_role)
+            self.allRoleList.addItems(self._all_role)
 
         def update_select_role():
             self.selectRoleList.clear()
-            self.selectRoleList.addItems(self.select_role)
+            self.selectRoleList.addItems(self._select_role)
 
         update_total()
         update_all_role()
         update_select_role()
 
     def save_option(self):
-        if not self.select_role:
+        if not self._select_role:
             return False
-        self.total_player = self.totalSetSpinBox.value()
-        set_total_player(self.total_player)
-        set_role_type(self.select_role[:])
+        self._total_player = self.totalSetSpinBox.value()
+        set_total_player(self._total_player)
+        set_role_type(self._select_role[:])
         return True
 
     def closeEvent(self, close_event):
         flag = True
-        msg = QMessageBox()
-        msg.setWindowTitle('保存')
-        msg.setText('是否保存设置？')
-        msg.setIcon(QMessageBox.Question)
-        msg.addButton('确定', QMessageBox.YesRole)
-        msg.addButton('取消', QMessageBox.NoRole)
-        reply = msg.exec()
+        reply = show_save_msg(self)
         if reply == QMessageBox.AcceptRole:
             if not self.save_option():
                 msg = QMessageBox()
@@ -489,27 +526,27 @@ class FilterDialog(QDialog, Ui_FliterDialog):
     def __init__(self):
         super(FilterDialog, self).__init__()
         self.setupUi(self)
-        self.total_player = get_total_player()
-        self.now_player = get_user_db(get_now_player())
+        self._total_player = get_total_player()
+        self._now_player = get_user_db(get_now_player())
         self.init_items()
         self.init_button()
 
     def init_items(self):
-        if not self.now_player:
+        if not self._now_player:
             return
         group_box = self.playerList
         button_box = QVBoxLayout()
-        if self.now_player.__dict__.get('filter_list'):
-            for index, choose in self.now_player.filter_list:
+        if self._now_player.__dict__.get('filter_list'):
+            for index, choose in self._now_player.filter_list:
                 check_box = QCheckBox(str(index) + "号")
                 check_box.setObjectName(str(index))
                 check_box.setChecked(choose)
                 check_box.stateChanged.connect(self.check_box_changed)
                 button_box.addWidget(check_box)
         else:
-            self.now_player.filter_list = []
-            for index in range(self.total_player):
-                result = self.now_player.find_record(index + 1)
+            self._now_player.filter_list = []
+            for index in range(self._total_player):
+                result = self._now_player.find_record(index + 1)
                 if result:
                     check_box = QCheckBox(group_box)
                     check_box.setObjectName(str(index + 1))
@@ -517,7 +554,7 @@ class FilterDialog(QDialog, Ui_FliterDialog):
                     check_box.setChecked(True)
                     check_box.stateChanged.connect(self.check_box_changed)
                     button_box.addWidget(check_box)
-                    self.now_player.filter_list.append((index + 1, True))
+                    self._now_player.filter_list.append((index + 1, True))
         group_box.setLayout(button_box)
 
     def init_button(self):
@@ -545,15 +582,15 @@ class FilterDialog(QDialog, Ui_FliterDialog):
     def check_box_changed(self):
         sender = self.sender()
         mid = int(sender.objectName())
-        filter_list = self.now_player.filter_list
+        filter_list = self._now_player.filter_list
         if isinstance(sender, QCheckBox):
             if sender.isChecked():
                 if (mid, False) in filter_list:
-                    index = self.now_player.filter_list.index((mid, False))
-                    self.now_player.filter_list[index] = (mid, True)
+                    index = self._now_player.filter_list.index((mid, False))
+                    self._now_player.filter_list[index] = (mid, True)
             elif (mid, True) in filter_list:
-                index = self.now_player.filter_list.index((mid, True))
-                self.now_player.filter_list[index] = (mid, False)
+                index = self._now_player.filter_list.index((mid, True))
+                self._now_player.filter_list[index] = (mid, False)
 
 
 def update_filter():
@@ -573,3 +610,41 @@ def update_filter():
             flag = True
     if flag:
         MAIN_WIN.filterButton.setText("筛选*")
+
+
+class DefaultOption(QDialog, Ui_defaultOption):
+    def __init__(self):
+        super(DefaultOption, self).__init__()
+        self.setupUi(self)
+        self._config = get_default_range()
+        self.read_config()
+
+    def read_config(self):
+        for key, value in self._config.items():
+            self.__dict__.get(key).setValue(value)
+
+    def closeEvent(self, close_event):
+        reply = show_save_msg(self)
+        if reply == QMessageBox.AcceptRole:
+            for key, value in self._config.items():
+                if self._config.get(key):
+                    self._config[key] = self.__dict__.get(key).value()
+            set_default_range(**self._config)
+
+
+def show_save_msg(parent):
+    msg = QMessageBox(parent)
+    msg.setWindowTitle("保存")
+    msg.setIcon(msg.Question)
+    msg.setText("是否保存设置？")
+    msg.addButton('确定', QMessageBox.YesRole)
+    msg.addButton('取消', QMessageBox.NoRole)
+    return msg.exec()
+
+
+def show_tip_msg(parent, title, text):
+    msg = QMessageBox(parent)
+    msg.setWindowTitle(title)
+    msg.setIcon(QMessageBox.Information)
+    msg.setText(text)
+    msg.exec()
