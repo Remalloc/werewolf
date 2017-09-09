@@ -31,10 +31,10 @@ ROLE_STYLE = {'狼人': DEFAULT_STYLE % ':/img/狼人',
 
 DEFAULT_THRESHOLD = 2.5
 DEFAULT_WEAK_SUPPORT_RANGE = 0.5
-DEFAULT_WEAK_OPPOSE_RANGE = 0.5
-DEFAULT_STRONG_SUPPORT_RANGE = 1
-DEFAULT_STRONG_OPPOSE_RANGE = 1
-DEFAULT_VOTE_RANGE = 2
+DEFAULT_WEAK_OPPOSE_RANGE = -0.5
+DEFAULT_STRONG_SUPPORT_RANGE = 1.0
+DEFAULT_STRONG_OPPOSE_RANGE = -1.0
+DEFAULT_VOTE_RANGE = 2.0
 
 
 def read_config():
@@ -45,11 +45,11 @@ def read_config():
 
         try:
             with open(PATH_CONFIG, 'r') as file:
-                jsonData = json.load(file)
+                json_data = json.load(file)
         except IOError:
             raise IOError('The file(%s) open error' % PATH_CONFIG)
 
-        for var, value in jsonData.items():
+        for var, value in json_data.items():
             if all_var.get(var) is not None:
                 if var == 'USER_DB':
                     for mid, role in value.items():
@@ -126,3 +126,25 @@ def add_now_round():
     global NOW_ROUND
     NOW_ROUND += 1
     return get_now_round()
+
+
+def get_default_range():
+    return {'teamThreshold': DEFAULT_THRESHOLD,
+            'weakSupport': DEFAULT_WEAK_SUPPORT_RANGE,
+            'weakOppose': DEFAULT_WEAK_OPPOSE_RANGE,
+            'strongSupport': DEFAULT_STRONG_SUPPORT_RANGE,
+            'strongOppose': DEFAULT_STRONG_OPPOSE_RANGE,
+            'voteRange': DEFAULT_VOTE_RANGE}
+
+
+def set_default_range(**kwargs):
+    switch_name = {'teamThreshold': 'DEFAULT_THRESHOLD',
+                   'weakSupport': 'DEFAULT_WEAK_SUPPORT_RANGE',
+                   'weakOppose': 'DEFAULT_WEAK_OPPOSE_RANGE',
+                   'strongSupport': 'DEFAULT_STRONG_SUPPORT_RANGE',
+                   'strongOppose': 'DEFAULT_STRONG_OPPOSE_RANGE',
+                   'voteRange': 'DEFAULT_VOTE_RANGE'}
+    for key, value in kwargs.items():
+        key = switch_name.get(key)
+        if globals().get(key):
+            globals()[key] = value
