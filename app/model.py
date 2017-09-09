@@ -59,16 +59,18 @@ class Users():
 
     @property
     def relation(self):
-        return [(self.id, user.id, value) for user, value in self._relation.items()]
+        return [(user.id, value) for user, value in self._relation.items()]
 
     @type_check
-    def add_relation(self, user, value: int = 0):
+    def add_relation(self, user, value: float = 0):
         if not self._relation.get(user):
             self._relation[user] = value
+        else:
+            self._relation[user] += value
         return value
 
     @type_check
-    def modify_relation(self, user, value: int):
+    def modify_relation(self, user, value: float):
         if self._relation.get(user):
             self._relation[user] = value
             return value
