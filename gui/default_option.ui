@@ -30,7 +30,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="QDoubleSpinBox" name="doubleSpinBox">
+      <widget class="QDoubleSpinBox" name="teamThreshold">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -54,7 +54,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>暗捞增加幅度：</string>
+        <string>暗捞幅度：</string>
        </property>
       </widget>
      </item>
@@ -67,12 +67,12 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>明捞增加幅度：</string>
+        <string>明捞幅度：</string>
        </property>
       </widget>
      </item>
      <item row="1" column="1">
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_2">
+      <widget class="QDoubleSpinBox" name="weakSupport">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -96,7 +96,7 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>重踩减少幅度：</string>
+        <string>重踩幅度：</string>
        </property>
       </widget>
      </item>
@@ -109,12 +109,12 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>轻踩减少幅度：</string>
+        <string>轻踩幅度：</string>
        </property>
       </widget>
      </item>
      <item row="3" column="1">
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_4">
+      <widget class="QDoubleSpinBox" name="weakOppose">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -124,13 +124,19 @@
        <property name="decimals">
         <number>1</number>
        </property>
+       <property name="minimum">
+        <double>-100.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>0.000000000000000</double>
+       </property>
        <property name="singleStep">
         <double>0.500000000000000</double>
        </property>
       </widget>
      </item>
      <item row="2" column="1">
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_3">
+      <widget class="QDoubleSpinBox" name="strongSupport">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -146,7 +152,7 @@
       </widget>
      </item>
      <item row="4" column="1">
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_5">
+      <widget class="QDoubleSpinBox" name="strongOppose">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
          <horstretch>0</horstretch>
@@ -155,6 +161,12 @@
        </property>
        <property name="decimals">
         <number>1</number>
+       </property>
+       <property name="minimum">
+        <double>-100.000000000000000</double>
+       </property>
+       <property name="maximum">
+        <double>0.000000000000000</double>
        </property>
        <property name="singleStep">
         <double>0.500000000000000</double>
@@ -170,12 +182,12 @@
         </sizepolicy>
        </property>
        <property name="text">
-        <string>投票增加幅度：</string>
+        <string>投票幅度：</string>
        </property>
       </widget>
      </item>
      <item row="5" column="1">
-      <widget class="QDoubleSpinBox" name="doubleSpinBox_6">
+      <widget class="QDoubleSpinBox" name="voteRange">
        <property name="sizePolicy">
         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
          <horstretch>0</horstretch>
