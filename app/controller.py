@@ -209,7 +209,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         @check_player
         def click_vote():
             change_click_event(EventType.VOTE_EVENT)
-            change_event(('收到投票', 'vote'))
+            change_event(('收到投票', 'voteRange'))
 
         @check_player
         def click_dead():
@@ -286,6 +286,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
                 return
             sender.add_act_record(EVENT[0], recipient)
             sender.add_vote(recipient.id)
+            recipient.add_relation(sender, default_range[EVENT[1]])
             self.update_player_info(now_player)
 
         elif CLICK_EVENT is EventType.SHERIFF_EVENT:
@@ -346,40 +347,71 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         def get_max(member):
             max_value = max(member.relation, key=itemgetter(1))[1] if member.relation else 0
             if max_value < default_range['teamThreshold']:
-                return None
+                return {}
             return {mid: value for mid, value in member.relation if value == max_value}
 
         def get_min(member):
-            min_value = min(member.relation, key=itemgetter(1)) if member.relation else 0
+            min_value = min(member.relation, key=itemgetter(1))[1] if member.relation else 0
             if min_value > -default_range['teamThreshold']:
-                return None
+                return {}
             return {mid: value for mid, value in member.relation if value == min_value}
 
         def add_member(team: list, all_member: dict):
             if not all_member:
                 return
             for mid, value in all_member.items():
+                if mid in team:
+                    continue
+                team.append(mid)
                 member = get_user_db(mid)
+                add_member(team, get_max(member))
 
         def filter_member(team: list):
             for member_id in team:
                 member = get_user_db(member_id)
-                min_value = min(member.relation, key=itemgetter(1))
-                if min_value[1] < 0:
-                    team.remove(min_value[0])
+                min_values = get_min(member)
+                for mid in min_values.keys():
+                    if mid in team:
+                        team.remove(member_id)
+
+        def calculate_probability(team: list):
+            threshold = default_range['teamThreshold']
+            total = 0
+            cnt = 0
+            for mid in team:
+                member = get_user_db(mid)
+                other = [oid for oid in team if oid != member.id]
+                for oid in other:
+                    value = member.find_relation(oid)
+                    if value:
+                        total += (value - threshold) / threshold
+                        cnt += 1
+            init_value = default_range['rate'] / get_total_player() if get_total_player() != 0 else 0
+            return init_value + (total / cnt if cnt != 0 else 0)
 
         self.cancel_target()
         all_team = []
+        all_probability = []
         users = get_all_user_db()
         default_range = get_default_range()
         for user in users.values():
             all_users = functools.reduce(lambda x, y: x + y, all_team) if all_team else []
-            user = get_max(user)
-            if not [x for x in user.keys() if x in all_users]:
-                now_team = []
-                add_member(now_team, user)
-                all_team.append(now_team)
-        print(all_team)
+            max_user = get_max(user)
+            if not [x for x in max_user.keys() if x in all_users]:
+                now_team = [user.id]
+                add_member(now_team, max_user)
+                filter_member(now_team)
+                if len(now_team) >1:
+                    all_team.append(now_team)
+        for now_team in all_team:
+            all_probability.append(calculate_probability(now_team))
+
+        text = list(zip(all_team, all_probability))
+        result = ["可能团队及概率："]
+        for now_team, prob in text:
+            string = str(now_team) + " → " + str(round(prob * 100, 3)) + r"%"
+            result.append(string)
+        show_tip_msg(self, self.teamAnalysis.text(), '\n'.join(result))
 
     def click_filter_button(self):
         self.cancel_target()
