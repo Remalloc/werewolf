@@ -35,6 +35,7 @@ DEFAULT_WEAK_OPPOSE_RANGE = -0.5
 DEFAULT_STRONG_SUPPORT_RANGE = 1.0
 DEFAULT_STRONG_OPPOSE_RANGE = -1.0
 DEFAULT_VOTE_RANGE = 2.0
+DEFAULT_RATE = 0.5
 
 
 def read_config():
@@ -134,7 +135,8 @@ def get_default_range():
             'weakOppose': DEFAULT_WEAK_OPPOSE_RANGE,
             'strongSupport': DEFAULT_STRONG_SUPPORT_RANGE,
             'strongOppose': DEFAULT_STRONG_OPPOSE_RANGE,
-            'voteRange': DEFAULT_VOTE_RANGE}
+            'voteRange': DEFAULT_VOTE_RANGE,
+            'rate': DEFAULT_RATE}
 
 
 def set_default_range(**kwargs):
@@ -143,7 +145,8 @@ def set_default_range(**kwargs):
                    'weakOppose': 'DEFAULT_WEAK_OPPOSE_RANGE',
                    'strongSupport': 'DEFAULT_STRONG_SUPPORT_RANGE',
                    'strongOppose': 'DEFAULT_STRONG_OPPOSE_RANGE',
-                   'voteRange': 'DEFAULT_VOTE_RANGE'}
+                   'voteRange': 'DEFAULT_VOTE_RANGE',
+                   'rate': 'DEFAULT_RATE'}
     for key, value in kwargs.items():
         key = switch_name.get(key)
         if globals().get(key):
