@@ -1,24 +1,26 @@
 <RCC>
-  <qresource prefix="/img" lang="zh_CN">
-    <file alias="死亡">img/死亡.png</file>
-    <file alias="投票">img/投票.png</file>
-    <file alias="暗捞">img/暗捞.png</file>
-    <file alias="明捞">img/明捞.png</file>
-    <file alias="轻踩">img/轻踩.png</file>
-    <file alias="重踩">img/重踩.png</file>
-    <file alias="白痴">img/白痴.png</file>
-    <file alias="白狼王">img/白狼王.png</file>
-    <file alias="村民">img/村民.png</file>
-    <file alias="村长">img/村长.png</file>
-    <file alias="盗贼">img/盗贼.png</file>
-    <file alias="警长">img/警长.png</file>
-    <file alias="狼人">img/狼人.png</file>
-    <file alias="猎人">img/猎人.png</file>
-    <file alias="女巫">img/女巫.png</file>
-    <file alias="丘比特">img/丘比特.png</file>
-    <file alias="守卫">img/守卫.png</file>
-    <file alias="未知">img/未知.png</file>
-    <file alias="预言家">img/预言家.png</file>
-    <file alias="自定义">img/自定义.png</file>
-  </qresource>
+    <qresource prefix="/img" lang="zh_CN">
+        <file alias="logo-white">img/logo-white.png</file>
+        <file alias="logo-black">img/logo-black.png</file>
+        <file alias="死亡">img/死亡.png</file>
+        <file alias="投票">img/投票.png</file>
+        <file alias="暗捞">img/暗捞.png</file>
+        <file alias="明捞">img/明捞.png</file>
+        <file alias="轻踩">img/轻踩.png</file>
+        <file alias="重踩">img/重踩.png</file>
+        <file alias="白痴">img/白痴.png</file>
+        <file alias="白狼王">img/白狼王.png</file>
+        <file alias="村民">img/村民.png</file>
+        <file alias="村长">img/村长.png</file>
+        <file alias="盗贼">img/盗贼.png</file>
+        <file alias="警长">img/警长.png</file>
+        <file alias="狼人">img/狼人.png</file>
+        <file alias="猎人">img/猎人.png</file>
+        <file alias="女巫">img/女巫.png</file>
+        <file alias="丘比特">img/丘比特.png</file>
+        <file alias="守卫">img/守卫.png</file>
+        <file alias="未知">img/未知.png</file>
+        <file alias="预言家">img/预言家.png</file>
+        <file alias="自定义">img/自定义.png</file>
+    </qresource>
 </RCC>

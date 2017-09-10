@@ -11,12 +11,15 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_FliterDialog(object):
     def setupUi(self, FliterDialog):
         FliterDialog.setObjectName("FliterDialog")
-        FliterDialog.resize(380, 214)
+        FliterDialog.resize(380, 236)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(FliterDialog.sizePolicy().hasHeightForWidth())
         FliterDialog.setSizePolicy(sizePolicy)
+        icon = QtGui.QIcon()
+        icon.addPixmap(QtGui.QPixmap(":/img/logo-black"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
+        FliterDialog.setWindowIcon(icon)
         self.gridLayout = QtWidgets.QGridLayout(FliterDialog)
         self.gridLayout.setObjectName("gridLayout")
         self.verticalLayout = QtWidgets.QVBoxLayout()
@@ -75,6 +78,7 @@ class Ui_FliterDialog(object):
         self.cancelButton.setText(_translate("FliterDialog", "取消"))
         self.playerList.setTitle(_translate("FliterDialog", "显示玩家"))
 
+import gui.img
 
 if __name__ == "__main__":
     import sys

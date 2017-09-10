@@ -6,12 +6,16 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>958</width>
-    <height>696</height>
+    <width>1012</width>
+    <height>666</height>
    </rect>
   </property>
   <property name="windowTitle">
-   <string>MainWindow</string>
+   <string>狼人杀记牌器</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="img.qrc">
+    <normaloff>:/img/logo-black</normaloff>:/img/logo-black</iconset>
   </property>
   <property name="layoutDirection">
    <enum>Qt::LeftToRight</enum>
@@ -42,6 +46,11 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+           </font>
           </property>
           <property name="text">
            <string>1号</string>
@@ -76,6 +85,11 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>7号</string>
           </property>
@@ -108,6 +122,11 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+           </font>
           </property>
           <property name="text">
            <string>8号</string>
@@ -142,6 +161,11 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>3号</string>
           </property>
@@ -174,6 +198,11 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+           </font>
           </property>
           <property name="text">
            <string>5号</string>
@@ -208,6 +237,11 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>6号</string>
           </property>
@@ -240,6 +274,11 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+           </font>
           </property>
           <property name="text">
            <string>4号</string>
@@ -274,6 +313,11 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>2号</string>
           </property>
@@ -306,6 +350,11 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+           </font>
           </property>
           <property name="text">
            <string>9号</string>
@@ -340,6 +389,11 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>10号</string>
           </property>
@@ -372,6 +426,11 @@
             <horstretch>0</horstretch>
             <verstretch>0</verstretch>
            </sizepolicy>
+          </property>
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+           </font>
           </property>
           <property name="text">
            <string>11号</string>
@@ -406,6 +465,11 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>12号</string>
           </property>
@@ -428,6 +492,11 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
         <property name="text">
          <string>玩家信息</string>
         </property>
@@ -447,6 +516,11 @@
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
+        <property name="font">
+         <font>
+          <pointsize>12</pointsize>
+         </font>
+        </property>
        </widget>
       </item>
       <item>
@@ -456,6 +530,11 @@
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
         </property>
         <property name="text">
          <string>行为记录</string>
@@ -485,6 +564,11 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="font">
+           <font>
+            <pointsize>11</pointsize>
+           </font>
+          </property>
           <property name="text">
            <string>筛选</string>
           </property>
@@ -501,9 +585,14 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>958</width>
+     <width>1012</width>
      <height>26</height>
     </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>9</pointsize>
+    </font>
    </property>
    <widget class="QMenu" name="menuGame">
     <property name="title">
@@ -565,6 +654,8 @@
    </property>
   </action>
  </widget>
- <resources/>
+ <resources>
+  <include location="img.qrc"/>
+ </resources>
  <connections/>
 </ui>

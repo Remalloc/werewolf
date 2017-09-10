@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>380</width>
-    <height>214</height>
+    <height>236</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -18,6 +18,10 @@
   </property>
   <property name="windowTitle">
    <string>筛选</string>
+  </property>
+  <property name="windowIcon">
+   <iconset resource="img.qrc">
+    <normaloff>:/img/logo-black</normaloff>:/img/logo-black</iconset>
   </property>
   <layout class="QGridLayout" name="gridLayout">
    <item row="0" column="1">
@@ -91,6 +95,8 @@
    </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="img.qrc"/>
+ </resources>
  <connections/>
 </ui>
