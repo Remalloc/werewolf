@@ -79,7 +79,7 @@ class Users():
 
     @type_check
     def find_relation(self, mid: int):
-        for user, value in self.relation:
+        for user, value in self._relation.items():
             if user.id == mid:
                 return value
         return None
