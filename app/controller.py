@@ -401,7 +401,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
                 now_team = [user.id]
                 add_member(now_team, max_user)
                 filter_member(now_team)
-                if len(now_team) >1:
+                if len(now_team) > 1:
                     all_team.append(now_team)
         for now_team in all_team:
             all_probability.append(calculate_probability(now_team))
@@ -431,6 +431,7 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
         self._total_player = get_total_player()
         self._select_role = get_role_type()[:]
         self._all_role = [role for role in get_all_role() if role not in self._select_role]
+        self._custom_role = []
         self.init_button_connect()
         self.init_role_list()
 
@@ -471,13 +472,31 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
             if flag and text != '' and len(text) < 15:
                 if text not in self._select_role:
                     self._select_role.append(text)
+                    self._custom_role.append(text)
                     add_all_role(text)
                     self.update_data()
             elif flag:
-                msg = QMessageBox()
-                msg.setWindowTitle("输入错误")
-                msg.setText("名字不能为空且长度不能超过15个字符！")
-                msg.exec()
+                show_tip_msg(self, "输入错误", "名字不能为空且长度不能超过15个字符！")
+
+        def click_del_button():
+            reply = show_select_msg(self, "删除", "是否删除选定角色？(只能删除自定义角色)")
+            if reply != QMessageBox.AcceptRole:
+                return
+            all_role_list = self.allRoleList.selectedItems()
+            select_role_list = self.selectRoleList.selectedItems()
+
+            for item in all_role_list:
+                index = self.allRoleList.row(item)
+                item_text = self.allRoleList.takeItem(index).text()
+                if item_text in self._custom_role:
+                    self._all_role.remove(item_text)
+
+            for item in select_role_list:
+                index = self.selectRoleList.row(item)
+                item_text = self.selectRoleList.takeItem(index).text()
+                if item_text in self._custom_role:
+                    self._select_role.remove(item_text)
+            self.update_data()
 
         self.totalSetSpinBox.valueChanged.connect(change_spinbox)
         self.defaultButton.clicked.connect(click_default_button)
@@ -485,6 +504,7 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
         self.rightButton.clicked.connect(click_right_button)
         self.leftButton.clicked.connect(click_left_button)
         self.addButton.clicked.connect(click_add_button)
+        self.delButton.clicked.connect(click_del_button)
 
     def init_role_list(self):
         self.allRoleList.setSelectionMode(QListWidget.MultiSelection)
@@ -665,10 +685,14 @@ class DefaultOption(QDialog, Ui_defaultOption):
 
 
 def show_save_msg(parent):
+    return show_select_msg(parent, "保存", "是否保存设置？")
+
+
+def show_select_msg(parent, title, text):
     msg = QMessageBox(parent)
-    msg.setWindowTitle("保存")
+    msg.setWindowTitle(title)
     msg.setIcon(msg.Question)
-    msg.setText("是否保存设置？")
+    msg.setText(text)
     msg.addButton('确定', QMessageBox.YesRole)
     msg.addButton('取消', QMessageBox.NoRole)
     return msg.exec()
