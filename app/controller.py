@@ -431,7 +431,7 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
         self._total_player = get_total_player()
         self._select_role = get_role_type()[:]
         self._all_role = [role for role in get_all_role() if role not in self._select_role]
-        self._custom_role = []
+        self._custom_role = get_custom_role()
         self.init_button_connect()
         self.init_role_list()
 
