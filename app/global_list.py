@@ -6,11 +6,12 @@ PATH_CONFIG = join('.', 'config.json')
 
 TOTAL_PLAYER = 0
 USER_DB = {}
-NOW_ROUND = 0
 NOW_PLAYER = 0
 
 ROLE_TYPE = []
 ALL_ROLE = ['狼人', '村民', '预言家', '丘比特', '猎人', '白痴', '守卫', '盗贼', '村长', '白狼王', '女巫']
+CUSTOM_ROLE = []
+
 ACTION_TYPE = ("明捞", "暗捞", "重踩", "轻踩")
 DEAD_TYPE = ('未知', '中刀', '中毒', '中枪', '流放', '链接')
 DEFAULT_STYLE = 'border-image:url(%s);border-radius:10px;'
@@ -42,7 +43,6 @@ def read_config():
     all_var = globals()
     if exists(PATH_CONFIG):
         import json
-        import app.model
 
         try:
             with open(PATH_CONFIG, 'r') as file:
@@ -51,13 +51,17 @@ def read_config():
             raise IOError('The file(%s) open error' % PATH_CONFIG)
 
         for var, value in json_data.items():
-            if all_var.get(var) is not None:
-                if var == 'USER_DB':
-                    for mid, role in value.items():
-                        mid = int(mid)
-                        app.model.Users(mid, role)
-                else:
-                    all_var[var] = value
+            if all_var.get(var):
+                all_var[var] = value
+
+
+def save_config():
+    import json
+
+    save_dict = {'TOTAL_PLAYER': TOTAL_PLAYER,
+                 }
+    with open(PATH_CONFIG, 'w') as file:
+        json_data = 0
 
 
 def get_total_player():
@@ -115,18 +119,12 @@ def add_all_role(role: str):
     return role
 
 
+def get_custom_role():
+    return CUSTOM_ROLE
+
+
 def get_role_style(role: str):
     return ROLE_STYLE.get(role)
-
-
-def get_now_round():
-    return NOW_ROUND
-
-
-def add_now_round():
-    global NOW_ROUND
-    NOW_ROUND += 1
-    return get_now_round()
 
 
 def get_default_range():
