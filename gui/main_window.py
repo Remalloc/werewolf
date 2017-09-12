@@ -11,7 +11,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
-        MainWindow.resize(1012, 666)
+        MainWindow.resize(858, 590)
         icon = QtGui.QIcon()
         icon.addPixmap(QtGui.QPixmap(":/img/logo-black"), QtGui.QIcon.Normal, QtGui.QIcon.Off)
         MainWindow.setWindowIcon(icon)
@@ -314,7 +314,7 @@ class Ui_MainWindow(object):
         self.verticalLayout_2 = QtWidgets.QVBoxLayout()
         self.verticalLayout_2.setObjectName("verticalLayout_2")
         self.infoLabel = QtWidgets.QLabel(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.infoLabel.sizePolicy().hasHeightForWidth())
@@ -338,7 +338,7 @@ class Ui_MainWindow(object):
         self.infoList.setObjectName("infoList")
         self.verticalLayout_2.addWidget(self.infoList)
         self.recordLabel = QtWidgets.QLabel(self.centralwidget)
-        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Preferred)
+        sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.recordLabel.sizePolicy().hasHeightForWidth())
@@ -374,7 +374,7 @@ class Ui_MainWindow(object):
         self.gridLayout_2.addLayout(self.verticalLayout_2, 0, 1, 1, 1)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 1012, 26))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 858, 26))
         font = QtGui.QFont()
         font.setPointSize(9)
         self.menubar.setFont(font)
@@ -401,11 +401,17 @@ class Ui_MainWindow(object):
         self.viewVote = QtWidgets.QAction(MainWindow)
         self.viewVote.setObjectName("viewVote")
         self.setDefault = QtWidgets.QAction(MainWindow)
+        self.setDefault.setChecked(False)
         self.setDefault.setObjectName("setDefault")
+        self.actionClean = QtWidgets.QAction(MainWindow)
+        self.actionClean.setCheckable(True)
+        self.actionClean.setChecked(False)
+        self.actionClean.setObjectName("actionClean")
         self.menuGame.addAction(self.newGame)
         self.menuGame.addAction(self.teamAnalysis)
         self.menuGame.addAction(self.viewVote)
         self.menu.addAction(self.setDefault)
+        self.menu.addAction(self.actionClean)
         self.menubar.addAction(self.menuGame.menuAction())
         self.menubar.addAction(self.menu.menuAction())
 
@@ -439,8 +445,8 @@ class Ui_MainWindow(object):
         self.teamAnalysis.setText(_translate("MainWindow", "团队分析"))
         self.viewVote.setText(_translate("MainWindow", "查看投票"))
         self.setDefault.setText(_translate("MainWindow", "默认值设置"))
+        self.actionClean.setText(_translate("MainWindow", "纯净模式"))
 
-import gui.img
 
 if __name__ == "__main__":
     import sys
