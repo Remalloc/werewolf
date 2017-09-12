@@ -2,7 +2,7 @@
 from os.path import join, exists
 import gui.img
 
-PATH_CONFIG = join('.', 'config.json')
+PATH_CONFIG = join('.', 'config.dat')
 
 TOTAL_PLAYER = 0
 USER_DB = {}
@@ -40,7 +40,6 @@ DEFAULT_RATE = 0.5
 
 
 def read_config():
-    all_var = globals()
     if exists(PATH_CONFIG):
         import json
 
@@ -51,17 +50,29 @@ def read_config():
             raise IOError('The file(%s) open error' % PATH_CONFIG)
 
         for var, value in json_data.items():
-            if all_var.get(var):
-                all_var[var] = value
+            globals()[var] = value
 
 
 def save_config():
     import json
 
     save_dict = {'TOTAL_PLAYER': TOTAL_PLAYER,
+                 'ROLE_TYPE': ROLE_TYPE,
+                 'ALL_ROLE': ALL_ROLE,
+                 'CUSTOM_ROLE': CUSTOM_ROLE,
+                 'DEFAULT_THRESHOLD': DEFAULT_THRESHOLD,
+                 'DEFAULT_WEAK_SUPPORT_RANGE': DEFAULT_WEAK_SUPPORT_RANGE,
+                 'DEFAULT_WEAK_OPPOSE_RANGE': DEFAULT_WEAK_OPPOSE_RANGE,
+                 'DEFAULT_STRONG_SUPPORT_RANGE': DEFAULT_STRONG_SUPPORT_RANGE,
+                 'DEFAULT_STRONG_OPPOSE_RANGE': DEFAULT_STRONG_OPPOSE_RANGE,
+                 'DEFAULT_VOTE_RANGE': DEFAULT_VOTE_RANGE,
+                 'DEFAULT_RATE': DEFAULT_RATE
                  }
-    with open(PATH_CONFIG, 'w') as file:
-        json_data = 0
+    try:
+        with open(PATH_CONFIG, 'w') as file:
+            json.dump(save_dict, file)
+    except IOError:
+        raise IOError('The file(%s) open error' % PATH_CONFIG)
 
 
 def get_total_player():
