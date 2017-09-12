@@ -56,6 +56,8 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         self.setDefault.triggered.connect(self.open_set_default)
         self.teamAnalysis.triggered.connect(self.analyse_team)
         self.filterButton.clicked.connect(self.click_filter_button)
+        self.actionClean.triggered.connect(self.clean_mode)
+        read_config()
 
     def init_player(self):
         def set_button_icon(btn):
@@ -169,7 +171,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
 
         update_info_list()
         update_record_list()
-        update_filter()
+        clean_filter()
 
     def init_tool_bar(self):
         def check_player(fun):
@@ -264,7 +266,6 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         if CLICK_EVENT is not EventType.DEAD_EVENT:
             if sender.dead or recipient.dead:
                 self.cancel_target()
-                print("dead")
                 return
 
         def is_self():
@@ -280,6 +281,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
             sender.add_act_record(EVENT[0], recipient)
             sender.add_relation(recipient, default_range[EVENT[1]])
             self.update_player_info(now_player)
+            self.cancel_target()
 
         elif CLICK_EVENT is EventType.VOTE_EVENT:
             if is_self():
@@ -422,6 +424,28 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         self.cancel_target()
         default_option = DefaultOption()
         default_option.exec()
+
+    def clean_mode(self):
+        if not self.sender().isChecked():
+            self.toolBar.show()
+            self.infoList.show()
+            self.infoLabel.show()
+            self.recordList.show()
+            self.recordLabel.show()
+            self.filterButton.show()
+            if self.width() - self.height() != 268:
+                self.setGeometry(self.x(), self.y(), self.height() + 268, self.height())
+        else:
+            self.toolBar.hide()
+            self.infoList.hide()
+            self.infoLabel.hide()
+            self.recordList.hide()
+            self.recordLabel.hide()
+            self.filterButton.hide()
+            self.setGeometry(self.x(), self.y(), self.height(), self.height())
+
+    def closeEvent(self, *args, **kwargs):
+        save_config()
 
 
 class ControlGameSetForm(QWidget, Ui_GameSetForm):
@@ -647,9 +671,9 @@ class FilterDialog(QDialog, Ui_FliterDialog):
 
 def update_filter():
     now_player = get_user_db(get_now_player())
-    MAIN_WIN.filterButton.setText("筛选")
     if not now_player or not now_player.__dict__.get('filter_list'):
         return
+    MAIN_WIN.filterButton.setText("筛选")
     record_list = MAIN_WIN.recordList
     filter_list = now_player.filter_list
 
@@ -662,6 +686,15 @@ def update_filter():
             flag = True
     if flag:
         MAIN_WIN.filterButton.setText("筛选*")
+
+
+def clean_filter():
+    now_player = get_user_db(get_now_player())
+    MAIN_WIN.filterButton.setText("筛选")
+    if not now_player or not now_player.__dict__.get('filter_list'):
+        return
+    now_player.__dict__['filter_list'] = []
+    update_filter()
 
 
 class DefaultOption(QDialog, Ui_defaultOption):
