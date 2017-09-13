@@ -607,10 +607,18 @@
      <string>高级</string>
     </property>
     <addaction name="setDefault"/>
-    <addaction name="actionClean"/>
+    <addaction name="cleanMode"/>
+   </widget>
+   <widget class="QMenu" name="menu_2">
+    <property name="title">
+     <string>关于</string>
+    </property>
+    <addaction name="contactAuthor"/>
+    <addaction name="softwareInfo"/>
    </widget>
    <addaction name="menuGame"/>
    <addaction name="menu"/>
+   <addaction name="menu_2"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <widget class="QToolBar" name="toolBar">
@@ -657,7 +665,7 @@
     <string>默认值设置</string>
    </property>
   </action>
-  <action name="actionClean">
+  <action name="cleanMode">
    <property name="checkable">
     <bool>true</bool>
    </property>
@@ -666,6 +674,16 @@
    </property>
    <property name="text">
     <string>纯净模式</string>
+   </property>
+  </action>
+  <action name="contactAuthor">
+   <property name="text">
+    <string>联系作者</string>
+   </property>
+  </action>
+  <action name="softwareInfo">
+   <property name="text">
+    <string>软件信息</string>
    </property>
   </action>
  </widget>
