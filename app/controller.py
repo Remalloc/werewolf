@@ -463,12 +463,13 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         save_config()
 
     def init_view(self):
-        if get_clean_mode():
-            self.cleanMode.setChecked(True)
-            self.cleanMode.triggered.emit()
         geometry = get_geometry()
         if geometry:
             self.setGeometry(*geometry)
+        if get_clean_mode():
+            self.cleanMode.setChecked(True)
+            self.cleanMode.triggered.emit()
+
 
 
 class ControlGameSetForm(QWidget, Ui_GameSetForm):
