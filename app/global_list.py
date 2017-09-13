@@ -3,11 +3,15 @@ from os.path import join, exists
 import gui.img
 
 PATH_CONFIG = join('.', 'config.dat')
+SOFTWARE_INFO = "狼人杀记牌器v1.0"
+AUTHOR = "邮箱：remalloc.virtual@gmail.com\n" \
+         "源码：https://github.com/Remalloc/werewolf"
 
 TOTAL_PLAYER = 0
 USER_DB = {}
 NOW_PLAYER = 0
 CLEAN_MODE = False
+POSITION = ()
 
 ROLE_TYPE = []
 ALL_ROLE = ['狼人', '村民', '预言家', '丘比特', '猎人', '白痴', '守卫', '盗贼', '村长', '白狼王', '女巫']
@@ -68,13 +72,24 @@ def save_config():
                  'DEFAULT_STRONG_OPPOSE_RANGE': DEFAULT_STRONG_OPPOSE_RANGE,
                  'DEFAULT_VOTE_RANGE': DEFAULT_VOTE_RANGE,
                  'DEFAULT_RATE': DEFAULT_RATE,
-                 'CLEAN_MODE': CLEAN_MODE
+                 'CLEAN_MODE': CLEAN_MODE,
+                 'POSITION': POSITION
                  }
     try:
         with open(PATH_CONFIG, 'w') as file:
             json.dump(save_dict, file)
     except IOError:
         raise IOError('The file(%s) open error' % PATH_CONFIG)
+
+
+def get_position():
+    return POSITION
+
+
+def set_position(*position):
+    if len(position) == 2:
+        global POSITION
+        POSITION = position
 
 
 def get_total_player():

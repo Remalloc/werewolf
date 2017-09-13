@@ -49,15 +49,26 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         global MAIN_WIN
         MAIN_WIN = self
+        self.init_menu()
         self.init_player()
         self.init_tool_bar()
+        self.filterButton.clicked.connect(self.click_filter_button)
+        read_config()
+
+    def init_menu(self):
         self.newGame.triggered.connect(self.open_new_game)
         self.viewVote.triggered.connect(self.view_vote)
         self.setDefault.triggered.connect(self.open_set_default)
         self.teamAnalysis.triggered.connect(self.analyse_team)
-        self.filterButton.clicked.connect(self.click_filter_button)
-        self.actionClean.triggered.connect(self.clean_mode)
-        read_config()
+        self.cleanMode.triggered.connect(self.clean_mode)
+        self.contactAuthor.triggered.connect(self.contact_author)
+        self.softwareInfo.triggered.connect(self.software_info)
+
+    def contact_author(self):
+        show_tip_msg(self, self.contactAuthor.text(), AUTHOR)
+
+    def software_info(self):
+        show_tip_msg(self, self.softwareInfo.text(), SOFTWARE_INFO)
 
     def init_player(self):
         def set_button_icon(btn):
@@ -448,12 +459,16 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
             self.setGeometry(self.x(), self.y(), self.height(), self.height())
 
     def closeEvent(self, *args, **kwargs):
+        set_position(self.x(), self.y())
         save_config()
 
     def init_view(self):
         if get_clean_mode():
-            self.actionClean.setChecked(True)
-            self.actionClean.triggered.emit()
+            self.cleanMode.setChecked(True)
+            self.cleanMode.triggered.emit()
+        position = get_position()
+        if position:
+            self.setGeometry(position[0], position[1], self.width(), self.height())
 
 
 class ControlGameSetForm(QWidget, Ui_GameSetForm):
