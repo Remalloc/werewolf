@@ -459,16 +459,16 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
             self.setGeometry(self.x(), self.y(), self.height(), self.height())
 
     def closeEvent(self, *args, **kwargs):
-        set_position(self.x(), self.y())
+        set_geometry(self.x(), self.y(),self.width(),self.height())
         save_config()
 
     def init_view(self):
         if get_clean_mode():
             self.cleanMode.setChecked(True)
             self.cleanMode.triggered.emit()
-        position = get_position()
-        if position:
-            self.setGeometry(position[0], position[1], self.width(), self.height())
+        geometry = get_geometry()
+        if geometry:
+            self.setGeometry(*geometry)
 
 
 class ControlGameSetForm(QWidget, Ui_GameSetForm):

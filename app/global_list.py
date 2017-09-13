@@ -11,7 +11,7 @@ TOTAL_PLAYER = 0
 USER_DB = {}
 NOW_PLAYER = 0
 CLEAN_MODE = False
-POSITION = ()
+GEOMETRY = ()
 
 ROLE_TYPE = []
 ALL_ROLE = ['狼人', '村民', '预言家', '丘比特', '猎人', '白痴', '守卫', '盗贼', '村长', '白狼王', '女巫']
@@ -73,7 +73,7 @@ def save_config():
                  'DEFAULT_VOTE_RANGE': DEFAULT_VOTE_RANGE,
                  'DEFAULT_RATE': DEFAULT_RATE,
                  'CLEAN_MODE': CLEAN_MODE,
-                 'POSITION': POSITION
+                 'GEOMETRY': GEOMETRY
                  }
     try:
         with open(PATH_CONFIG, 'w') as file:
@@ -82,14 +82,14 @@ def save_config():
         raise IOError('The file(%s) open error' % PATH_CONFIG)
 
 
-def get_position():
-    return POSITION
+def get_geometry():
+    return GEOMETRY
 
 
-def set_position(*position):
-    if len(position) == 2:
-        global POSITION
-        POSITION = position
+def set_geometry(*geometry):
+    if len(geometry) == 4:
+        global GEOMETRY
+        GEOMETRY = geometry
 
 
 def get_total_player():
