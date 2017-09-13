@@ -9,4 +9,5 @@ if __name__ == '__main__':
     win = QApplication(sys.argv)
     MAIN_WIN = ControlMainWindow()
     MAIN_WIN.show()
+    MAIN_WIN.init_view()
     sys.exit(win.exec_())
