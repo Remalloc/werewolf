@@ -7,6 +7,7 @@ PATH_CONFIG = join('.', 'config.dat')
 TOTAL_PLAYER = 0
 USER_DB = {}
 NOW_PLAYER = 0
+CLEAN_MODE = False
 
 ROLE_TYPE = []
 ALL_ROLE = ['狼人', '村民', '预言家', '丘比特', '猎人', '白痴', '守卫', '盗贼', '村长', '白狼王', '女巫']
@@ -66,7 +67,8 @@ def save_config():
                  'DEFAULT_STRONG_SUPPORT_RANGE': DEFAULT_STRONG_SUPPORT_RANGE,
                  'DEFAULT_STRONG_OPPOSE_RANGE': DEFAULT_STRONG_OPPOSE_RANGE,
                  'DEFAULT_VOTE_RANGE': DEFAULT_VOTE_RANGE,
-                 'DEFAULT_RATE': DEFAULT_RATE
+                 'DEFAULT_RATE': DEFAULT_RATE,
+                 'CLEAN_MODE': CLEAN_MODE
                  }
     try:
         with open(PATH_CONFIG, 'w') as file:
@@ -91,6 +93,15 @@ def get_now_player():
 def set_now_player(mid: int):
     global NOW_PLAYER
     NOW_PLAYER = mid
+
+
+def get_clean_mode():
+    return CLEAN_MODE
+
+
+def set_clean_mode(tf: bool):
+    global CLEAN_MODE
+    CLEAN_MODE = tf
 
 
 def get_user_db(user: int):

@@ -299,7 +299,8 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
                     recipient_lab.setText(default_lab)
                     self.sheriff = None
                 else:
-                    self.sheriff.setText(default_lab)
+                    if self.sheriff.text().split()[1] != '(死亡)':
+                        self.sheriff.setText(default_lab)
                     recipient_lab.setText(sheriff_lab)
                     self.sheriff = recipient_lab
             else:
@@ -427,6 +428,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
 
     def clean_mode(self):
         if not self.sender().isChecked():
+            set_clean_mode(False)
             self.toolBar.show()
             self.infoList.show()
             self.infoLabel.show()
@@ -436,6 +438,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
             if self.width() - self.height() != 268:
                 self.setGeometry(self.x(), self.y(), self.height() + 268, self.height())
         else:
+            set_clean_mode(True)
             self.toolBar.hide()
             self.infoList.hide()
             self.infoLabel.hide()
@@ -446,6 +449,11 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
 
     def closeEvent(self, *args, **kwargs):
         save_config()
+
+    def init_view(self):
+        if get_clean_mode():
+            self.actionClean.setChecked(True)
+            self.actionClean.triggered.emit()
 
 
 class ControlGameSetForm(QWidget, Ui_GameSetForm):
