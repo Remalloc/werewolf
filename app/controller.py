@@ -275,7 +275,9 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
 
         # To determine whether the player is dead
         if CLICK_EVENT is not EventType.DEAD_EVENT:
-            if sender.dead or recipient.dead:
+            if CLICK_EVENT is EventType.SHERIFF_EVENT and not recipient.dead:
+                pass
+            elif sender.dead or recipient.dead:
                 self.cancel_target()
                 return
 
