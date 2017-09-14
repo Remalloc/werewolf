@@ -127,6 +127,7 @@ class Users():
     def info(self):
         self._info = {'位置：': self._id,
                       '角色：': self._role,
+                      '收到投票：': self._vote,
                       '死亡：': '是 ' + self._dead[1] if self._dead[0] else '否 '}
         return self._info
 
