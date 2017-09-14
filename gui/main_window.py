@@ -326,7 +326,7 @@ class Ui_MainWindow(object):
         self.infoLabel.setObjectName("infoLabel")
         self.verticalLayout_2.addWidget(self.infoLabel)
         self.infoList = QtWidgets.QListWidget(self.centralwidget)
-        self.infoList.setEnabled(False)
+        self.infoList.setEnabled(True)
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Minimum, QtWidgets.QSizePolicy.Minimum)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -458,6 +458,7 @@ class Ui_MainWindow(object):
         self.cleanMode.setText(_translate("MainWindow", "纯净模式"))
         self.contactAuthor.setText(_translate("MainWindow", "联系作者"))
         self.softwareInfo.setText(_translate("MainWindow", "软件信息"))
+
 
 if __name__ == "__main__":
     import sys
