@@ -1,6 +1,5 @@
 # coding = utf-8
 from os.path import join, exists
-import gui.img
 
 PATH_CONFIG = join('.', 'config.dat')
 SOFTWARE_INFO = "狼人杀记牌器v1.0"

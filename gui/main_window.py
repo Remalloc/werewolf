@@ -459,6 +459,7 @@ class Ui_MainWindow(object):
         self.contactAuthor.setText(_translate("MainWindow", "联系作者"))
         self.softwareInfo.setText(_translate("MainWindow", "软件信息"))
 
+import gui.img
 
 if __name__ == "__main__":
     import sys

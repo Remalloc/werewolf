@@ -23,13 +23,9 @@ def type_check(fun):
     return wrapper
 
 
-class Users():
+class Users:
     @type_check
     def __init__(self, mid: int, role: str):
-        """
-        :param relation: {user:relation_num} the relation_num is indicates the intimacy(weight) of the target role
-        :param act_record:[(self,action,target)...]
-        """
         self._id = mid
         self._role = role
         self._relation = {}

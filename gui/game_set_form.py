@@ -146,7 +146,6 @@ class Ui_GameSetForm(object):
         self.defaultButton.setText(_translate("GameSetForm", "默认设置"))
         self.determineButton.setText(_translate("GameSetForm", "确定"))
 
-import gui.img
 
 if __name__ == "__main__":
     import sys

@@ -161,7 +161,6 @@ class Ui_defaultOption(object):
         self.label_6.setText(_translate("defaultOption", "投票幅度："))
         self.label_7.setText(_translate("defaultOption", "团队概率初始值："))
 
-import gui.img
 
 if __name__ == "__main__":
     import sys

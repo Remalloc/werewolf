@@ -78,7 +78,6 @@ class Ui_FliterDialog(object):
         self.cancelButton.setText(_translate("FliterDialog", "取消"))
         self.playerList.setTitle(_translate("FliterDialog", "显示玩家"))
 
-import gui.img
 
 if __name__ == "__main__":
     import sys
