@@ -299,7 +299,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
                 return
             sender.add_act_record(EVENT[0], recipient)
             sender.add_vote(recipient.id)
-            recipient.add_relation(sender, default_range[EVENT[1]])
+            recipient.add_relation(sender, -default_range[EVENT[1]])
             self.update_player_info(now_player)
 
         elif CLICK_EVENT is EventType.SHERIFF_EVENT:
