@@ -34,7 +34,6 @@ class Users():
         self._role = role
         self._relation = {}
         self._act_record = []
-        self._reliable = 0
         self._vote = []
         self._info = {}
         self._dead = False, ''
@@ -111,19 +110,6 @@ class Users():
         return result
 
     @property
-    def reliable(self):
-        return self._reliable
-
-    @reliable.setter
-    def reliable(self, value: int):
-        self._reliable = value
-
-    @type_check
-    def add_reliable(self, value: int):
-        self._reliable += value
-        return self._reliable
-
-    @property
     def dead(self):
         return self._dead[0]
 
@@ -141,7 +127,6 @@ class Users():
     def info(self):
         self._info = {'位置：': self._id,
                       '角色：': self._role,
-                      '可信度：': self._reliable,
                       '死亡：': '是 ' + self._dead[1] if self._dead[0] else '否 '}
         return self._info
 
