@@ -110,7 +110,9 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
             btn.setFlat(True)
             lab.hide()
 
-        # Init USER_DB
+        # Init USER_DB, info, record
+        self.infoList.clear()
+        self.recordList.clear()
         clear_user_db()
         for mid in range(get_total_player()):
             Users(mid + 1, '未知')
@@ -123,6 +125,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
             player_label = self.__dict__.get(label)
             if player_button and player_label:
                 btn_lab_enabled(player_button, player_label)
+                player_label.setText(str(mid + 1) + "号")
                 player_button.disconnect()
                 player_button.clicked.connect(self.click_player_button)
                 set_btn_menu(player_button)
@@ -301,7 +304,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
                 return
             sender.add_act_record(EVENT[0], recipient)
             sender.add_vote(recipient.id)
-            recipient.add_relation(sender, -default_range[EVENT[1]])
+            recipient.add_relation(sender, default_range[EVENT[1]])
             self.update_player_info(now_player)
 
         elif CLICK_EVENT is EventType.SHERIFF_EVENT:
@@ -539,12 +542,16 @@ class ControlGameSetForm(QWidget, Ui_GameSetForm):
                 item_text = self.allRoleList.takeItem(index).text()
                 if item_text in self._custom_role:
                     self._all_role.remove(item_text)
+                    self._custom_role.remove(item_text)
+                    del_all_role(item_text)
 
             for item in select_role_list:
                 index = self.selectRoleList.row(item)
                 item_text = self.selectRoleList.takeItem(index).text()
                 if item_text in self._custom_role:
                     self._select_role.remove(item_text)
+                    self._custom_role.remove(item_text)
+                    del_all_role(item_text)
             self.update_data()
 
         self.totalSetSpinBox.valueChanged.connect(change_spinbox)

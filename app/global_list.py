@@ -12,8 +12,8 @@ NOW_PLAYER = 0
 CLEAN_MODE = False
 GEOMETRY = ()
 
-ROLE_TYPE = []
-ALL_ROLE = ['狼人', '村民', '预言家', '丘比特', '猎人', '白痴', '守卫', '盗贼', '村长', '白狼王', '女巫']
+ROLE_TYPE = ['未知']
+ALL_ROLE = ['未知', '狼人', '村民', '预言家', '丘比特', '猎人', '白痴', '守卫', '盗贼', '村长', '白狼王', '女巫']
 CUSTOM_ROLE = []
 
 ACTION_TYPE = ("明捞", "暗捞", "重踩", "轻踩")
@@ -39,7 +39,7 @@ DEFAULT_WEAK_SUPPORT_RANGE = 0.5
 DEFAULT_WEAK_OPPOSE_RANGE = -0.5
 DEFAULT_STRONG_SUPPORT_RANGE = 1.0
 DEFAULT_STRONG_OPPOSE_RANGE = -1.0
-DEFAULT_VOTE_RANGE = 2.0
+DEFAULT_VOTE_RANGE = -2.0
 DEFAULT_RATE = 0.5
 
 
@@ -152,6 +152,11 @@ def get_all_role():
 
 def add_all_role(role: str):
     ALL_ROLE.append(role)
+    return role
+
+
+def del_all_role(role: str):
+    ALL_ROLE.remove(role)
     return role
 
 
