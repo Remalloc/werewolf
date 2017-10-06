@@ -426,7 +426,10 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
             all_probability.append(calculate_probability(now_team))
 
         text = list(zip(all_team, all_probability))
-        result = ["可能团队及概率："]
+        if text:
+            result = ["可能团队及概率："]
+        else:
+            result = []
         for now_team, prob in text:
             string = str(now_team) + " → " + str(round(prob * 100, 3)) + r"%"
             result.append(string)
@@ -767,5 +770,7 @@ def show_tip_msg(parent, title, text):
     msg = QMessageBox(parent)
     msg.setWindowTitle(title)
     msg.setIcon(QMessageBox.Information)
+    if not text:
+        text = '    无       '
     msg.setText(text)
     msg.exec()
