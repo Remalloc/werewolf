@@ -13,7 +13,9 @@ CLEAN_MODE = False
 GEOMETRY = ()
 
 ROLE_TYPE = ['未知']
-ALL_ROLE = ['未知', '狼人', '村民', '预言家', '丘比特', '猎人', '白痴', '守卫', '盗贼', '村长', '白狼王', '女巫']
+ALL_ROLE = ['未知', '狼人', '村民', '预言家',
+            '丘比特', '猎人', '白痴', '守卫',
+            '盗贼', '村长', '白狼王', '女巫']
 CUSTOM_ROLE = []
 
 ACTION_TYPE = ("明捞", "暗捞", "重踩", "轻踩")
@@ -41,6 +43,9 @@ DEFAULT_STRONG_SUPPORT_RANGE = 1.0
 DEFAULT_STRONG_OPPOSE_RANGE = -1.0
 DEFAULT_VOTE_RANGE = -2.0
 DEFAULT_RATE = 0.5
+DEFAULT_GOLD_WATER = 2.0
+DEFAULT_SILVER_RANGE = 1.0
+DEFAULT_SHERIFF_VOTE = 0.5
 
 
 def read_config():
@@ -175,7 +180,10 @@ def get_default_range():
             'strongSupport': DEFAULT_STRONG_SUPPORT_RANGE,
             'strongOppose': DEFAULT_STRONG_OPPOSE_RANGE,
             'voteRange': DEFAULT_VOTE_RANGE,
-            'rate': DEFAULT_RATE}
+            'rate': DEFAULT_RATE,
+            'goldWater': DEFAULT_GOLD_WATER,
+            'silverWater': DEFAULT_SILVER_RANGE,
+            'sheriffVote': DEFAULT_SHERIFF_VOTE}
 
 
 def set_default_range(**kwargs):
@@ -185,7 +193,10 @@ def set_default_range(**kwargs):
                    'strongSupport': 'DEFAULT_STRONG_SUPPORT_RANGE',
                    'strongOppose': 'DEFAULT_STRONG_OPPOSE_RANGE',
                    'voteRange': 'DEFAULT_VOTE_RANGE',
-                   'rate': 'DEFAULT_RATE'}
+                   'rate': 'DEFAULT_RATE',
+                   'goldWater': 'DEFAULT_GOLD_WATER',
+                   'silverWater': 'DEFAULT_SILVER_RANGE',
+                   'sheriffVote': 'DEFAULT_SHERIFF_VOTE'}
     for key, value in kwargs.items():
         key = switch_name.get(key)
         if globals().get(key):
