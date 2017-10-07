@@ -1,4 +1,8 @@
 # coding = utf-8
+import functools
+from enum import Enum, auto, unique
+from operator import itemgetter
+
 from PyQt5.QtWidgets import QWidget, QDialog, QMainWindow, QMessageBox, QListWidget, \
     QInputDialog, QLineEdit, QMenu, QAction, QCheckBox, QVBoxLayout
 from PyQt5.QtCore import Qt
@@ -7,11 +11,9 @@ from gui.main_window import Ui_MainWindow
 from gui.game_set_form import Ui_GameSetForm
 from gui.filter_dialog import Ui_FliterDialog
 from gui.default_option import Ui_defaultOption
+
 from app.model import Users
 from app.global_list import *
-import functools
-from enum import Enum, auto, unique
-from operator import itemgetter
 
 
 @unique
@@ -20,7 +22,9 @@ class EventType(Enum):
     TARGET_EVENT = auto()
     VOTE_EVENT = auto()
     SHERIFF_EVENT = auto()
+    WATER_EVENT = auto()
     DEAD_EVENT = auto()
+    IDENTIFY_EVENT = auto()
 
 
 MAIN_WIN = None
@@ -203,6 +207,11 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
             change_event(('警长', 'sheriff'))
 
         @check_player
+        def click_sheriff_vote():
+            change_click_event(EventType.VOTE_EVENT)
+            change_event(('收到投票(上警)', 'sheriffVote'))
+
+        @check_player
         def click_strong_support():
             change_click_event(EventType.TARGET_EVENT)
             change_event(('明捞', 'strongSupport'))
@@ -225,12 +234,27 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         @check_player
         def click_vote():
             change_click_event(EventType.VOTE_EVENT)
-            change_event(('收到投票', 'voteRange'))
+            change_event(('收到投票(流放)', 'voteRange'))
 
         @check_player
         def click_dead():
             change_click_event(EventType.DEAD_EVENT)
             change_event((dead,))
+
+        @check_player
+        def click_gold_water():
+            change_click_event(EventType.WATER_EVENT)
+            change_event(('金水', 'goldWater'))
+
+        @check_player
+        def click_silver_water():
+            change_click_event(EventType.WATER_EVENT)
+            change_event(('银水', 'silverWater'))
+
+        @check_player
+        def click_identity():
+            change_click_event(EventType.IDENTIFY_EVENT)
+            change_event((identity,))
 
         def create_action(icon, desc):
             return QAction(QIcon(icon), desc, self.toolBar)
@@ -248,7 +272,11 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         weak_support = create_action(':/img/暗捞', '选择当前玩家的暗捞对象')
         weak_against = create_action(':/img/轻踩', '选择当前玩家的轻踩对象')
         strong_against = create_action(':/img/重踩', '选择当前玩家的重踩对象')
-        vote = create_action(':/img/投票', '选择给当前玩家投票的对象')
+        gold_water = create_action(':/img/金水', '选择金水玩家')
+        silver_water = create_action(':/img/银水', '选择银水玩家')
+        identity = create_action(':/img/指认', '指认玩家角色')
+        vote = create_action(':/img/投票', '(流放)选择给当前玩家投票的对象')
+        sheriff_vote = create_action(':/img/警长-投票', '(上警)选择给当前玩家投票的对象')
         dead = create_action(':/img/死亡', '选择死亡玩家')
 
         triggered_connect((sheriff, click_sheriff),
@@ -256,12 +284,17 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
                           (weak_support, click_weak_support),
                           (weak_against, click_weak_against),
                           (strong_against, click_strong_against),
+                          (gold_water, click_gold_water),
+                          (silver_water, click_silver_water),
+                          (identity, click_identity),
                           (vote, click_vote),
+                          (sheriff_vote, click_sheriff_vote),
                           (dead, click_dead))
 
-        toolbar_add_actions(sheriff, strong_support, weak_support,
-                            weak_against, strong_against, vote,
-                            dead)
+        toolbar_add_actions(sheriff, sheriff_vote, strong_support,
+                            weak_support, weak_against, strong_against,
+                            gold_water, silver_water, identity,
+                            vote, dead)
 
     def toolbar_act(self):
         """
@@ -303,7 +336,10 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
             if is_self():
                 return
             sender.add_act_record(EVENT[0], recipient)
-            sender.add_vote(recipient.id)
+            if EVENT[0].endswith('(流放)'):
+                sender.add_vote(recipient.id)
+            else:
+                sender.add_sf_vote(recipient.id)
             recipient.add_relation(sender, default_range[EVENT[1]])
             self.update_player_info(now_player)
 
@@ -332,9 +368,9 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
                 for dead in DEAD_TYPE:
                     action = tool.menu.addAction(dead)
                     action.triggered.connect(change_dead)
-                show_menu()
+                show_dead_menu()
 
-            def show_menu():
+            def show_dead_menu():
                 tool.menu.exec_(QCursor().pos())
 
             def change_dead():
@@ -344,8 +380,37 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
                 recipient.dead = True, dead_type
 
             create_menu()
-            self.cancel_target()
             self.update_player_info(recipient.id)
+            self.cancel_target()
+
+        elif CLICK_EVENT is EventType.WATER_EVENT:
+            if is_self():
+                return
+            sender.add_act_record(EVENT[0], recipient)
+            sender.add_relation(recipient, default_range[EVENT[1]])
+            self.update_player_info(now_player)
+            self.cancel_target()
+
+        elif CLICK_EVENT is EventType.IDENTIFY_EVENT:
+            tool = EVENT[0]
+
+            def create_menu():
+                tool.menu = QMenu(self)
+                for dead in get_role_type():
+                    action = tool.menu.addAction(dead)
+                    action.triggered.connect(add_record)
+                show_id_menu()
+
+            def show_id_menu():
+                tool.menu.exec_(QCursor().pos())
+
+            def add_record():
+                msg = ' 指认 ' + self.sender().text() + ' 是 '
+                sender.add_act_record(msg, recipient)
+
+            create_menu()
+            self.update_player_info(now_player)
+            self.cancel_target()
 
     def open_new_game(self):
         new_game = ControlGameSetForm()

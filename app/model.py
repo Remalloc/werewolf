@@ -31,6 +31,7 @@ class Users:
         self._relation = {}
         self._act_record = []
         self._vote = []
+        self._sf_vote = []
         self._info = {}
         self._dead = False, ''
         USER_DB[mid] = self
@@ -123,7 +124,8 @@ class Users:
     def info(self):
         self._info = {'位置：': self._id,
                       '角色：': self._role,
-                      '收到投票：': self._vote,
+                      '收到投票(流放)：': self._vote if self._vote else '无',
+                      '收到投票(上警)：': self._sf_vote if self._sf_vote else '无',
                       '死亡：': '是 ' + self._dead[1] if self._dead[0] else '否 '}
         return self._info
 
@@ -134,4 +136,13 @@ class Users:
     @type_check
     def add_vote(self, mid: int):
         self._vote.append(mid)
+        return mid
+
+    @property
+    def sf_vote(self):
+        return self._sf_vote
+
+    @type_check
+    def add_sf_vote(self, mid: int):
+        self._sf_vote.append(mid)
         return mid
