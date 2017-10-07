@@ -423,9 +423,10 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         result = []
         for user in user_db.values():
             if user.vote:
-                string = str(user.id) + ' ← ' + ' '.join(str(i) for i in user.vote)
+                string = str(user.id) + ' ← 流放：'+' '.join(str(i) for i in user.vote) + \
+                         "\n   ↖ 上警：" + ' '.join(str(i) for i in user.sf_vote)
                 result.append(string)
-        show_tip_msg(self, "投票结果", '\n'.join(result))
+        show_tip_msg(self, "投票结果(流放|上警)", '\n'.join(result))
 
     def analyse_team(self):
         def get_max(member):
