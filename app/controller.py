@@ -422,7 +422,7 @@ class ControlMainWindow(QMainWindow, Ui_MainWindow):
         user_db = get_all_user_db()
         result = []
         for user in user_db.values():
-            if user.vote:
+            if user.vote or user.sf_vote:
                 string = str(user.id) + ' ← 流放：'+' '.join(str(i) for i in user.vote) + \
                          "\n   ↖ 上警：" + ' '.join(str(i) for i in user.sf_vote)
                 result.append(string)
