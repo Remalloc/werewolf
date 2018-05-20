@@ -86,7 +86,7 @@
 
 隐藏工具栏和玩家信息，仅提供记录角色功能
 
-![纯净模式](https://github.com/Remalloc/werewolf/blob/develop/gif/%E7%BA%AF%E5%87%80%E6%A8%A1%E5%BC%8F.png)
+ <img src="https://github.com/Remalloc/werewolf/blob/develop/gif/%E7%BA%AF%E5%87%80%E6%A8%A1%E5%BC%8F.png" width = "600" height = "400" alt="纯净模式" align=center />
 
 ## 4.联系作者：
 **QQ**：718801907
